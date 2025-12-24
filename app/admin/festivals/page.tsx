@@ -1469,16 +1469,62 @@ export default function FestivalManagementPage() {
                     <span className="text-xs text-gray-600">Accent</span>
                   </div>
                 </div>
-                {/* Preview */}
-                <div
-                  className="mt-3 p-4 rounded-lg text-center text-white"
-                  style={{
-                    background: `linear-gradient(135deg, ${newFestival.colors.primary}, ${newFestival.colors.secondary})`
-                  }}
-                >
-                  <span className="text-2xl">{newFestival.icon}</span>
-                  <p className="font-semibold mt-1">{newFestival.displayName || 'Preview'}</p>
-                  <p className="text-sm opacity-90">{newFestival.greeting || 'Your greeting here'}</p>
+                {/* Banner Preview - matches actual FestivalBanner component */}
+                <div className="mt-3">
+                  <p className="text-xs text-gray-500 mb-1">Banner Preview:</p>
+                  <div
+                    className="relative py-3 px-4 text-center shadow-lg rounded-lg overflow-hidden"
+                    style={{
+                      background: `linear-gradient(135deg, ${newFestival.colors.primary}, ${newFestival.colors.secondary})`
+                    }}
+                  >
+                    {/* Decorative pattern */}
+                    <div
+                      className="absolute inset-0 opacity-10"
+                      style={{
+                        backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px)`,
+                      }}
+                    />
+
+                    <div className="relative flex items-center justify-center gap-3 text-white">
+                      {/* Festival Icon */}
+                      <span className="text-2xl animate-bounce">{newFestival.icon || '🎉'}</span>
+
+                      {/* Greeting Text */}
+                      <span className="font-semibold text-lg tracking-wide">
+                        {newFestival.greeting || 'Your greeting here'}
+                      </span>
+
+                      {/* Festival Icon (mirrored) */}
+                      <span className="text-2xl animate-bounce" style={{ animationDelay: '0.1s' }}>
+                        {newFestival.icon || '🎉'}
+                      </span>
+
+                      {/* Dismiss Button (visual only) */}
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2 text-white/50 p-1">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+
+                    {/* Animated underline */}
+                    <div
+                      className="absolute bottom-0 left-0 right-0 h-1"
+                      style={{
+                        background: `linear-gradient(90deg, transparent, ${newFestival.colors.accent}, transparent)`,
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -1848,15 +1894,73 @@ export default function FestivalManagementPage() {
       {showPreview && previewFestival && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl w-full max-w-lg overflow-hidden">
+            {/* Banner Preview - matches actual FestivalBanner */}
+            <div className="bg-gray-100 p-4">
+              <p className="text-xs text-gray-500 mb-2 text-center">Banner Preview</p>
+              <div
+                className="relative py-3 px-4 text-center shadow-lg rounded-lg overflow-hidden"
+                style={{
+                  background: `linear-gradient(135deg, ${previewFestival.colors.primary}, ${previewFestival.colors.secondary})`
+                }}
+              >
+                {/* Decorative pattern */}
+                <div
+                  className="absolute inset-0 opacity-10"
+                  style={{
+                    backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px)`,
+                  }}
+                />
+
+                <div className="relative flex items-center justify-center gap-3 text-white">
+                  {/* Festival Icon */}
+                  <span className="text-2xl animate-bounce">{previewFestival.icon}</span>
+
+                  {/* Greeting Text */}
+                  <span className="font-semibold text-lg tracking-wide">
+                    {previewFestival.greeting}
+                  </span>
+
+                  {/* Festival Icon (mirrored) */}
+                  <span className="text-2xl animate-bounce" style={{ animationDelay: '0.1s' }}>
+                    {previewFestival.icon}
+                  </span>
+
+                  {/* Dismiss Button (visual only) */}
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 text-white/50 p-1">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Animated underline */}
+                <div
+                  className="absolute bottom-0 left-0 right-0 h-1"
+                  style={{
+                    background: `linear-gradient(90deg, transparent, ${previewFestival.colors.accent}, transparent)`,
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Festival Info Card */}
             <div
-              className="p-6 text-white text-center"
+              className="p-4 text-white text-center"
               style={{
-                background: `linear-gradient(135deg, ${previewFestival.colors.primary}, ${previewFestival.colors.secondary})`
+                background: `linear-gradient(135deg, ${previewFestival.colors.primary}40, ${previewFestival.colors.secondary}40)`
               }}
             >
-              <span className="text-5xl mb-4 block animate-bounce">{previewFestival.icon}</span>
-              <h2 className="text-2xl font-bold mb-2">{previewFestival.displayName}</h2>
-              <p className="text-white/90">{previewFestival.greeting}</p>
+              <span className="text-4xl mb-2 block">{previewFestival.icon}</span>
+              <h2 className="text-xl font-bold text-gray-900">{previewFestival.displayName}</h2>
             </div>
 
             <div className="p-6">
