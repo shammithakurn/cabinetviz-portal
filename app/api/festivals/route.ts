@@ -8,6 +8,24 @@ import { getCurrentFestivalWithMeta, getActiveFestivals, Festival } from '@/lib/
 import { getClientIP, getCountryFromIP, getCountryName } from '@/lib/geolocation'
 import { prisma } from '@/lib/db'
 
+// Helper to get date components for comparison (ignores time)
+function getDateComponents(date: Date): { year: number; month: number; day: number } {
+  return {
+    year: date.getFullYear(),
+    month: date.getMonth(),
+    day: date.getDate()
+  }
+}
+
+// Compare dates by components only (ignores time and timezone)
+function compareDateOnly(date1: Date, date2: Date): number {
+  const d1 = getDateComponents(date1)
+  const d2 = getDateComponents(date2)
+  if (d1.year !== d2.year) return d1.year - d2.year
+  if (d1.month !== d2.month) return d1.month - d2.month
+  return d1.day - d2.day
+}
+
 // Check if a custom festival is active on a given date
 function isCustomFestivalActive(
   festival: { startDate: Date; endDate: Date; isActive: boolean; countries: string },
@@ -16,15 +34,15 @@ function isCustomFestivalActive(
 ): boolean {
   if (!festival.isActive) return false
 
-  // Check if date is within range
+  // Check if date is within range using date-only comparison
   const start = new Date(festival.startDate)
   const end = new Date(festival.endDate)
-  start.setHours(0, 0, 0, 0)
-  end.setHours(23, 59, 59, 999)
-  const checkDate = new Date(date)
-  checkDate.setHours(12, 0, 0, 0)
 
-  if (checkDate < start || checkDate > end) return false
+  // Compare dates by year/month/day only to avoid timezone issues
+  const isAfterOrOnStart = compareDateOnly(date, start) >= 0
+  const isBeforeOrOnEnd = compareDateOnly(date, end) <= 0
+
+  if (!isAfterOrOnStart || !isBeforeOrOnEnd) return false
 
   // Check country
   const countries = festival.countries.split(',').map(c => c.trim().toUpperCase())
@@ -40,7 +58,15 @@ export async function GET(request: Request) {
     const countryOverride = searchParams.get('country')
 
     // Determine the date to use
-    const date = dateOverride ? new Date(dateOverride) : new Date()
+    // Parse date string as local date (YYYY-MM-DD format) to avoid timezone issues
+    let date: Date
+    if (dateOverride) {
+      // Parse YYYY-MM-DD as local date by splitting and creating with components
+      const [year, month, day] = dateOverride.split('-').map(Number)
+      date = new Date(year, month - 1, day, 12, 0, 0) // Noon local time
+    } else {
+      date = new Date()
+    }
 
     // Determine the country
     let countryCode = countryOverride?.toUpperCase() || 'GLOBAL'
