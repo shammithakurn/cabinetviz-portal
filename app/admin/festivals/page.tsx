@@ -470,6 +470,53 @@ export default function FestivalManagementPage() {
 
   const filteredElements = animationElements.filter(e => e.category === selectedCategory)
 
+  // Calculate average/dominant props from selected elements' default properties
+  function calculateAverageProps(elements: AnimationElement[]): AnimationProps {
+    if (elements.length === 0) {
+      return {
+        size: { min: 20, max: 40 },
+        speed: { min: 3, max: 8 },
+        rotation: true,
+        rotationSpeed: 2,
+        fade: true,
+        fadeStart: 0.8,
+        swing: false,
+        swingAmount: 20,
+        density: 30,
+        direction: 'down',
+      }
+    }
+
+    // Average numeric values
+    const avgSizeMin = Math.round(elements.reduce((sum, e) => sum + e.defaultProps.size.min, 0) / elements.length)
+    const avgSizeMax = Math.round(elements.reduce((sum, e) => sum + e.defaultProps.size.max, 0) / elements.length)
+    const avgSpeedMin = Math.round(elements.reduce((sum, e) => sum + e.defaultProps.speed.min, 0) / elements.length * 10) / 10
+    const avgSpeedMax = Math.round(elements.reduce((sum, e) => sum + e.defaultProps.speed.max, 0) / elements.length * 10) / 10
+    const avgRotationSpeed = Math.round(elements.reduce((sum, e) => sum + e.defaultProps.rotationSpeed, 0) / elements.length * 10) / 10
+    const avgFadeStart = Math.round(elements.reduce((sum, e) => sum + e.defaultProps.fadeStart, 0) / elements.length * 100) / 100
+    const avgSwingAmount = Math.round(elements.reduce((sum, e) => sum + e.defaultProps.swingAmount, 0) / elements.length)
+    const avgDensity = Math.round(elements.reduce((sum, e) => sum + e.defaultProps.density, 0) / elements.length)
+
+    // Majority vote for booleans
+    const rotationCount = elements.filter(e => e.defaultProps.rotation).length
+    const fadeCount = elements.filter(e => e.defaultProps.fade).length
+    const swingCount = elements.filter(e => e.defaultProps.swing).length
+    const upCount = elements.filter(e => e.defaultProps.direction === 'up').length
+
+    return {
+      size: { min: avgSizeMin, max: avgSizeMax },
+      speed: { min: avgSpeedMin, max: avgSpeedMax },
+      rotation: rotationCount >= elements.length / 2,
+      rotationSpeed: avgRotationSpeed,
+      fade: fadeCount >= elements.length / 2,
+      fadeStart: avgFadeStart,
+      swing: swingCount >= elements.length / 2,
+      swingAmount: avgSwingAmount,
+      density: avgDensity,
+      direction: upCount > elements.length / 2 ? 'up' : 'down',
+    }
+  }
+
   return (
     <div className="p-8">
       {/* Header */}
@@ -1504,14 +1551,46 @@ export default function FestivalManagementPage() {
                             type="button"
                             onClick={() => {
                               if (isSelected) {
-                                setAnimationConfig({
-                                  ...animationConfig,
-                                  elements: animationConfig.elements.filter(e => e.elementId !== element.id)
-                                })
+                                // Remove element
+                                const newElements = animationConfig.elements.filter(e => e.elementId !== element.id)
+                                // Recalculate props from remaining elements
+                                if (newElements.length > 0) {
+                                  const remainingElements = newElements.map(e =>
+                                    animationElements.find(ae => ae.id === e.elementId)
+                                  ).filter(Boolean) as AnimationElement[]
+                                  const avgProps = calculateAverageProps(remainingElements)
+                                  setAnimationConfig({
+                                    elements: newElements,
+                                    props: avgProps
+                                  })
+                                } else {
+                                  // Reset to defaults if no elements left
+                                  setAnimationConfig({
+                                    elements: [],
+                                    props: {
+                                      size: { min: 20, max: 40 },
+                                      speed: { min: 3, max: 8 },
+                                      rotation: true,
+                                      rotationSpeed: 2,
+                                      fade: true,
+                                      fadeStart: 0.8,
+                                      swing: false,
+                                      swingAmount: 20,
+                                      density: 30,
+                                      direction: 'down',
+                                    }
+                                  })
+                                }
                               } else {
+                                // Add element and apply its defaults
+                                const newElements = [...animationConfig.elements, { elementId: element.id, weight: 50 }]
+                                const selectedElements = newElements.map(e =>
+                                  animationElements.find(ae => ae.id === e.elementId)
+                                ).filter(Boolean) as AnimationElement[]
+                                const avgProps = calculateAverageProps(selectedElements)
                                 setAnimationConfig({
-                                  ...animationConfig,
-                                  elements: [...animationConfig.elements, { elementId: element.id, weight: 50 }]
+                                  elements: newElements,
+                                  props: avgProps
                                 })
                               }
                             }}
@@ -1520,7 +1599,7 @@ export default function FestivalManagementPage() {
                                 ? 'bg-amber-500 ring-2 ring-amber-600 scale-110'
                                 : 'bg-gray-100 hover:bg-gray-200'
                             }`}
-                            title={element.name}
+                            title={`${element.name} (${element.defaultProps.direction === 'up' ? '↑' : '↓'})`}
                           >
                             {element.emoji}
                           </button>
@@ -1541,14 +1620,42 @@ export default function FestivalManagementPage() {
                             <span
                               key={elem.elementId}
                               className="inline-flex items-center gap-1 px-2 py-1 bg-amber-200 text-amber-900 rounded-full text-sm"
+                              title={`Default: ${element.defaultProps.direction === 'up' ? 'floats up' : 'falls down'}, speed ${element.defaultProps.speed.min}-${element.defaultProps.speed.max}`}
                             >
                               {element.emoji} {element.name}
+                              <span className="text-[10px] opacity-70">
+                                {element.defaultProps.direction === 'up' ? '↑' : '↓'}
+                              </span>
                               <button
                                 type="button"
-                                onClick={() => setAnimationConfig({
-                                  ...animationConfig,
-                                  elements: animationConfig.elements.filter(e => e.elementId !== elem.elementId)
-                                })}
+                                onClick={() => {
+                                  const newElements = animationConfig.elements.filter(e => e.elementId !== elem.elementId)
+                                  if (newElements.length > 0) {
+                                    const remainingElements = newElements.map(e =>
+                                      animationElements.find(ae => ae.id === e.elementId)
+                                    ).filter(Boolean) as AnimationElement[]
+                                    setAnimationConfig({
+                                      elements: newElements,
+                                      props: calculateAverageProps(remainingElements)
+                                    })
+                                  } else {
+                                    setAnimationConfig({
+                                      elements: [],
+                                      props: {
+                                        size: { min: 20, max: 40 },
+                                        speed: { min: 3, max: 8 },
+                                        rotation: true,
+                                        rotationSpeed: 2,
+                                        fade: true,
+                                        fadeStart: 0.8,
+                                        swing: false,
+                                        swingAmount: 20,
+                                        density: 30,
+                                        direction: 'down',
+                                      }
+                                    })
+                                  }
+                                }}
                                 className="ml-1 text-amber-700 hover:text-amber-900"
                               >
                                 ×
@@ -1562,7 +1669,7 @@ export default function FestivalManagementPage() {
 
                   {animationConfig.elements.length === 0 && (
                     <p className="mt-2 text-xs text-amber-700">
-                      Click on elements above to add them to your custom animation
+                      Click on elements above to add them. Smart defaults will be applied automatically based on real-world behavior (e.g., balloons float up, snowflakes drift down).
                     </p>
                   )}
 
@@ -1604,7 +1711,7 @@ export default function FestivalManagementPage() {
                         </button>
                       </div>
                       <p className="text-[10px] text-gray-500 mt-1">
-                        Use "Float Up" for balloons, bubbles, etc.
+                        Auto-set based on selected elements. Override if needed.
                       </p>
                     </div>
 
