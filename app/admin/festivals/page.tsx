@@ -446,25 +446,60 @@ export default function FestivalManagementPage() {
     return [...festivals, ...activeCustom]
   }
 
+  // Helper to parse date string to local date components (avoids timezone issues)
+  function parseDateToLocal(dateStr: string): { year: number; month: number; day: number } {
+    // Handle ISO date strings like "2025-12-25T00:00:00.000Z" or "2025-12-25"
+    const datePart = dateStr.split('T')[0]
+    const [year, month, day] = datePart.split('-').map(Number)
+    return { year, month, day }
+  }
+
+  // Format date string for display without timezone issues
+  function formatDateDisplay(dateStr: string): string {
+    const { year, month, day } = parseDateToLocal(dateStr)
+    return `${month}/${day}/${year}`
+  }
+
+  // Compare if a date (year, month, day) is within a range
+  function isDateInRange(
+    checkYear: number, checkMonth: number, checkDay: number,
+    startYear: number, startMonth: number, startDay: number,
+    endYear: number, endMonth: number, endDay: number
+  ): boolean {
+    const checkNum = checkYear * 10000 + checkMonth * 100 + checkDay
+    const startNum = startYear * 10000 + startMonth * 100 + startDay
+    const endNum = endYear * 10000 + endMonth * 100 + endDay
+    return checkNum >= startNum && checkNum <= endNum
+  }
+
   function getFestivalsForDay(day: number) {
     if (!day) return []
-    const date = new Date(selectedYear, selectedMonth - 1, day)
     const allFestivals = getAllFestivalsForCalendar()
     return allFestivals.filter(f => {
-      const start = new Date(f.startDate)
-      const end = new Date(f.endDate)
-      return date >= start && date <= end
+      const start = parseDateToLocal(f.startDate)
+      const end = parseDateToLocal(f.endDate)
+      return isDateInRange(
+        selectedYear, selectedMonth, day,
+        start.year, start.month, start.day,
+        end.year, end.month, end.day
+      )
     })
   }
 
   function getFestivalsForMonth(month: number) {
     const allFestivals = getAllFestivalsForCalendar()
+    const monthStart = { year: selectedYear, month, day: 1 }
+    const monthEnd = { year: selectedYear, month, day: new Date(selectedYear, month, 0).getDate() }
+
     return allFestivals.filter(f => {
-      const start = new Date(f.startDate)
-      const end = new Date(f.endDate)
-      const monthStart = new Date(selectedYear, month - 1, 1)
-      const monthEnd = new Date(selectedYear, month, 0)
-      return start <= monthEnd && end >= monthStart
+      const start = parseDateToLocal(f.startDate)
+      const end = parseDateToLocal(f.endDate)
+      // Check if festival range overlaps with month range
+      const startNum = start.year * 10000 + start.month * 100 + start.day
+      const endNum = end.year * 10000 + end.month * 100 + end.day
+      const monthStartNum = monthStart.year * 10000 + monthStart.month * 100 + monthStart.day
+      const monthEndNum = monthEnd.year * 10000 + monthEnd.month * 100 + monthEnd.day
+      return startNum <= monthEndNum && endNum >= monthStartNum
     })
   }
 
@@ -705,7 +740,7 @@ export default function FestivalManagementPage() {
                           )}
                         </div>
                         <p className="text-sm text-gray-600">
-                          {new Date(festival.startDate).toLocaleDateString()} - {new Date(festival.endDate).toLocaleDateString()}
+                          {formatDateDisplay(festival.startDate)} - {formatDateDisplay(festival.endDate)}
                         </p>
                         <div className="flex items-center gap-2 mt-2">
                           <span className="text-xs px-2 py-0.5 bg-gray-200 rounded-full text-gray-700 font-medium">
@@ -758,9 +793,12 @@ export default function FestivalManagementPage() {
             <div className="grid md:grid-cols-2 gap-4">
               {festivals.filter(f => {
                 const now = new Date()
-                const start = new Date(f.startDate)
-                const end = new Date(f.endDate)
-                return now >= start && now <= end
+                const todayNum = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate()
+                const start = parseDateToLocal(f.startDate)
+                const end = parseDateToLocal(f.endDate)
+                const startNum = start.year * 10000 + start.month * 100 + start.day
+                const endNum = end.year * 10000 + end.month * 100 + end.day
+                return todayNum >= startNum && todayNum <= endNum
               }).map(festival => (
                 <div
                   key={festival.id}
@@ -795,9 +833,12 @@ export default function FestivalManagementPage() {
               ))}
               {festivals.filter(f => {
                 const now = new Date()
-                const start = new Date(f.startDate)
-                const end = new Date(f.endDate)
-                return now >= start && now <= end
+                const todayNum = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate()
+                const start = parseDateToLocal(f.startDate)
+                const end = parseDateToLocal(f.endDate)
+                const startNum = start.year * 10000 + start.month * 100 + start.day
+                const endNum = end.year * 10000 + end.month * 100 + end.day
+                return todayNum >= startNum && todayNum <= endNum
               }).length === 0 && (
                 <div className="col-span-full text-center py-8 text-gray-600">
                   No festivals are currently active for {selectedCountry}
@@ -812,12 +853,23 @@ export default function FestivalManagementPage() {
             <div className="bg-white rounded-xl border border-gray-300 divide-y divide-gray-200">
               {festivals.filter(f => {
                 const now = new Date()
-                const start = new Date(f.startDate)
-                const thirtyDays = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
-                return start > now && start <= thirtyDays
-              }).sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+                const todayNum = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate()
+                const start = parseDateToLocal(f.startDate)
+                const startNum = start.year * 10000 + start.month * 100 + start.day
+                const thirtyDaysLater = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 30)
+                const thirtyDaysNum = thirtyDaysLater.getFullYear() * 10000 + (thirtyDaysLater.getMonth() + 1) * 100 + thirtyDaysLater.getDate()
+                return startNum > todayNum && startNum <= thirtyDaysNum
+              }).sort((a, b) => {
+                const aStart = parseDateToLocal(a.startDate)
+                const bStart = parseDateToLocal(b.startDate)
+                return (aStart.year * 10000 + aStart.month * 100 + aStart.day) - (bStart.year * 10000 + bStart.month * 100 + bStart.day)
+              })
               .map(festival => {
-                const daysUntil = Math.ceil((new Date(festival.startDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+                const now = new Date()
+                const start = parseDateToLocal(festival.startDate)
+                const startDate = new Date(start.year, start.month - 1, start.day)
+                const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+                const daysUntil = Math.ceil((startDate.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24))
                 const showPreFestivalBadge = daysUntil <= 3
 
                 return (
@@ -826,7 +878,7 @@ export default function FestivalManagementPage() {
                     <div className="flex-1">
                       <h4 className="font-semibold text-gray-900">{festival.displayName}</h4>
                       <p className="text-sm text-gray-600">
-                        Starts {new Date(festival.startDate).toLocaleDateString()}
+                        Starts {formatDateDisplay(festival.startDate)}
                       </p>
                     </div>
                     {showPreFestivalBadge && (
@@ -842,9 +894,12 @@ export default function FestivalManagementPage() {
               })}
               {festivals.filter(f => {
                 const now = new Date()
-                const start = new Date(f.startDate)
-                const thirtyDays = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
-                return start > now && start <= thirtyDays
+                const todayNum = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate()
+                const start = parseDateToLocal(f.startDate)
+                const startNum = start.year * 10000 + start.month * 100 + start.day
+                const thirtyDaysLater = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 30)
+                const thirtyDaysNum = thirtyDaysLater.getFullYear() * 10000 + (thirtyDaysLater.getMonth() + 1) * 100 + thirtyDaysLater.getDate()
+                return startNum > todayNum && startNum <= thirtyDaysNum
               }).length === 0 && (
                 <div className="p-8 text-center text-gray-600">
                   No upcoming festivals in the next 30 days
@@ -902,7 +957,7 @@ export default function FestivalManagementPage() {
                     </div>
                     <p className="text-sm text-gray-600">{festival.greeting}</p>
                     <p className="text-xs text-gray-500 mt-1">
-                      {new Date(festival.startDate).toLocaleDateString()}
+                      {formatDateDisplay(festival.startDate)}
                       {festival.isRecurring && ' (Yearly)'}
                     </p>
                   </div>
