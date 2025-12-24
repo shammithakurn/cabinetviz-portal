@@ -12,6 +12,7 @@ interface AnimationProps {
   swing: boolean
   swingAmount: number
   density: number
+  direction?: 'down' | 'up'
 }
 
 interface AnimationElement {
@@ -135,7 +136,11 @@ export function CustomAnimation({ intensity = 'medium', config, elements }: Cust
     swing: false,
     swingAmount: 20,
     density: 30,
+    direction: 'down' as const,
   }
+
+  // Ensure direction has a default value
+  const direction = props.direction || 'down'
 
   const spawnInterval = Math.max(20, 100 - props.density * intensityMultiplier)
   const maxParticles = Math.floor(50 * intensityMultiplier * (props.density / 30))
@@ -166,11 +171,16 @@ export function CustomAnimation({ intensity = 'medium', config, elements }: Cust
     const size = props.size.min + Math.random() * (props.size.max - props.size.min)
     const speed = props.speed.min + Math.random() * (props.speed.max - props.speed.min)
 
+    // Start position and velocity based on direction
+    const isUp = direction === 'up'
+    const startY = isUp ? canvas.height + size : -size
+    const velocityY = isUp ? -speed : speed
+
     return {
       x: Math.random() * canvas.width,
-      y: -size,
+      y: startY,
       vx: (Math.random() - 0.5) * 2,
-      vy: speed,
+      vy: velocityY,
       rotation: props.rotation ? Math.random() * 360 : 0,
       rotationSpeed: props.rotation ? (Math.random() - 0.5) * props.rotationSpeed * 2 : 0,
       emoji,
@@ -179,7 +189,7 @@ export function CustomAnimation({ intensity = 'medium', config, elements }: Cust
       swingOffset: Math.random() * Math.PI * 2,
       swingSpeed: 0.02 + Math.random() * 0.02,
     }
-  }, [getEmojis, props])
+  }, [getEmojis, props, direction])
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current
@@ -200,6 +210,8 @@ export function CustomAnimation({ intensity = 'medium', config, elements }: Cust
     }
 
     // Update and draw particles
+    const isUp = direction === 'up'
+
     particlesRef.current = particlesRef.current.filter((particle) => {
       // Update position
       particle.x += particle.vx
@@ -216,17 +228,34 @@ export function CustomAnimation({ intensity = 'medium', config, elements }: Cust
         particle.rotation += particle.rotationSpeed
       }
 
-      // Apply gravity and wind
-      particle.vy += 0.02
+      // Apply gravity/buoyancy and wind based on direction
+      if (isUp) {
+        // For upward movement, apply slight upward acceleration (buoyancy)
+        particle.vy -= 0.01
+        // Slow down horizontal drift for rising elements
+        particle.vx *= 0.99
+      } else {
+        // For downward movement, apply gravity
+        particle.vy += 0.02
+      }
       particle.vx += (Math.random() - 0.5) * 0.1
 
-      // Fade out
-      if (props.fade && particle.y > canvas.height * props.fadeStart) {
-        particle.life -= 0.02
+      // Fade out based on direction
+      if (props.fade) {
+        if (isUp && particle.y < canvas.height * (1 - props.fadeStart)) {
+          particle.life -= 0.02
+        } else if (!isUp && particle.y > canvas.height * props.fadeStart) {
+          particle.life -= 0.02
+        }
       }
 
+      // Check if particle is still visible based on direction
+      const isVisible = isUp
+        ? (particle.life > 0 && particle.y > -50)
+        : (particle.life > 0 && particle.y < canvas.height + 50)
+
       // Draw particle
-      if (particle.life > 0 && particle.y < canvas.height + 50) {
+      if (isVisible) {
         ctx.save()
         ctx.translate(particle.x, particle.y)
 
@@ -246,7 +275,7 @@ export function CustomAnimation({ intensity = 'medium', config, elements }: Cust
     })
 
     animationRef.current = requestAnimationFrame(draw)
-  }, [createParticle, spawnInterval, maxParticles, props])
+  }, [createParticle, spawnInterval, maxParticles, props, direction])
 
   useEffect(() => {
     const canvas = canvasRef.current

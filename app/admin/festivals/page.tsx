@@ -75,6 +75,7 @@ interface AnimationProps {
   swing: boolean
   swingAmount: number
   density: number
+  direction: 'down' | 'up'
 }
 
 interface AnimationConfig {
@@ -161,6 +162,7 @@ export default function FestivalManagementPage() {
       swing: false,
       swingAmount: 20,
       density: 30,
+      direction: 'down',
     },
   })
   const [selectedCategory, setSelectedCategory] = useState('FESTIVE')
@@ -339,6 +341,7 @@ export default function FestivalManagementPage() {
         swing: false,
         swingAmount: 20,
         density: 30,
+        direction: 'down',
       },
     })
   }
@@ -1566,6 +1569,45 @@ export default function FestivalManagementPage() {
                   {/* Animation properties */}
                   <div className="mt-4 pt-3 border-t border-amber-200">
                     <p className="text-xs font-medium text-gray-700 mb-2">Animation Properties:</p>
+
+                    {/* Direction selector */}
+                    <div className="mb-3">
+                      <label className="text-xs text-gray-600 block mb-1">Direction</label>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setAnimationConfig({
+                            ...animationConfig,
+                            props: { ...animationConfig.props, direction: 'down' }
+                          })}
+                          className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
+                            animationConfig.props.direction === 'down'
+                              ? 'bg-amber-500 text-white border-amber-600'
+                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                          }`}
+                        >
+                          ⬇️ Fall Down
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setAnimationConfig({
+                            ...animationConfig,
+                            props: { ...animationConfig.props, direction: 'up' }
+                          })}
+                          className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
+                            animationConfig.props.direction === 'up'
+                              ? 'bg-amber-500 text-white border-amber-600'
+                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                          }`}
+                        >
+                          ⬆️ Float Up
+                        </button>
+                      </div>
+                      <p className="text-[10px] text-gray-500 mt-1">
+                        Use "Float Up" for balloons, bubbles, etc.
+                      </p>
+                    </div>
+
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="text-xs text-gray-600">Density</label>

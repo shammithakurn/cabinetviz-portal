@@ -17,6 +17,7 @@ interface AnimationConfig {
     swing: boolean
     swingAmount: number
     density: number
+    direction?: 'down' | 'up'
   }
 }
 
