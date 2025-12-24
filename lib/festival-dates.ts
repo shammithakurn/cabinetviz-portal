@@ -329,10 +329,11 @@ export function isDateInRange(date: Date, start: Date, end: Date): boolean {
 }
 
 /**
- * Add days to a date
+ * Add days to a date (uses date components to avoid timezone issues)
  */
 export function addDays(date: Date, days: number): Date {
-  return new Date(date.getTime() + days * 24 * 60 * 60 * 1000)
+  const result = new Date(date.getFullYear(), date.getMonth(), date.getDate() + days)
+  return result
 }
 
 /**

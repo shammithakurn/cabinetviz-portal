@@ -50,10 +50,19 @@ function FestivalWrapperInner() {
         const params = new URLSearchParams()
         const dateOverride = searchParams.get('festival_date')
         const countryOverride = searchParams.get('festival_country')
-        if (dateOverride) params.set('date', dateOverride)
+
+        if (dateOverride) {
+          params.set('date', dateOverride)
+        } else {
+          // Always send the client's local date to avoid server timezone issues
+          const now = new Date()
+          const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+          params.set('date', localDate)
+        }
+
         if (countryOverride) params.set('country', countryOverride)
 
-        const apiUrl = `/api/festivals${params.toString() ? `?${params.toString()}` : ''}`
+        const apiUrl = `/api/festivals?${params.toString()}`
 
         // Fetch current festival
         const festivalRes = await fetch(apiUrl)
