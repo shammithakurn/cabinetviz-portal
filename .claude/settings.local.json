@@ -29,7 +29,14 @@
       "Bash(git push:*)",
       "Bash(npx vercel --prod --yes)",
       "Bash(npx vercel:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(gh repo create:*)",
+      "Bash(git remote add:*)",
+      "Bash(git branch:*)",
+      "Bash(for i in 1 2 3)",
+      "Bash(do echo \"Attempt $i...\")",
+      "Bash(break)",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []

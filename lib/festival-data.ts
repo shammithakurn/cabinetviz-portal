@@ -26,6 +26,7 @@ export type AnimationType =
   | 'leaves'
   | 'lanterns'
   | 'stars'
+  | 'custom'
 
 export type AnimationIntensity = 'low' | 'medium' | 'high'
 

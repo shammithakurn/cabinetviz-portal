@@ -13,14 +13,22 @@ export function FestivalBanner({ festival, greeting, onDismiss }: FestivalBanner
   const [isVisible, setIsVisible] = useState(true)
   const [isAnimating, setIsAnimating] = useState(false)
 
-  // Animate in on mount
+  // Animate in on mount and set CSS variable for nav offset
   useEffect(() => {
-    const timer = setTimeout(() => setIsAnimating(true), 100)
-    return () => clearTimeout(timer)
+    const timer = setTimeout(() => {
+      setIsAnimating(true)
+      // Set CSS variable for nav to use
+      document.documentElement.style.setProperty('--festival-banner-height', '52px')
+    }, 100)
+    return () => {
+      clearTimeout(timer)
+      document.documentElement.style.setProperty('--festival-banner-height', '0px')
+    }
   }, [])
 
   const handleDismiss = () => {
     setIsAnimating(false)
+    document.documentElement.style.setProperty('--festival-banner-height', '0px')
     setTimeout(() => {
       setIsVisible(false)
       onDismiss?.()
@@ -33,7 +41,7 @@ export function FestivalBanner({ festival, greeting, onDismiss }: FestivalBanner
 
   return (
     <div
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-[60] transition-all duration-300 ${
         isAnimating ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
       }`}
     >

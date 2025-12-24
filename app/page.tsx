@@ -50,8 +50,11 @@ export default async function HomePage() {
         }}
       />
 
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 px-[4%] py-5 flex justify-between items-center bg-warm-white/95 backdrop-blur-xl z-40 border-b border-border">
+      {/* Navigation - offset by festival banner height when present */}
+      <nav
+        className="fixed left-0 right-0 px-[4%] py-5 flex justify-between items-center bg-warm-white/95 backdrop-blur-xl z-40 border-b border-border transition-all duration-300"
+        style={{ top: 'var(--festival-banner-height, 0px)' }}
+      >
         <Link href="/" className="flex items-center gap-2">
           {theme.site_logo ? (
             <img src={theme.site_logo} alt={theme.site_name} className="h-9" />

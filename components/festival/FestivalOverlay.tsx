@@ -12,17 +12,34 @@ import {
   Stars,
   Fireworks,
   Confetti,
+  CustomAnimation,
 } from './animations'
+
+interface AnimationConfig {
+  elements: { elementId: string; weight: number }[]
+  props: {
+    size: { min: number; max: number }
+    speed: { min: number; max: number }
+    rotation: boolean
+    rotationSpeed: number
+    fade: boolean
+    fadeStart: number
+    swing: boolean
+    swingAmount: number
+    density: number
+  }
+}
 
 interface FestivalOverlayProps {
   festival: Festival | null
   greeting?: string
   showBanner?: boolean
   showAnimations?: boolean
+  customAnimationConfig?: AnimationConfig
 }
 
-// Map animation types to components
-const AnimationComponents: Record<AnimationType, React.ComponentType<{ intensity: AnimationIntensity }>> = {
+// Map animation types to components (excluding 'custom' which is handled separately)
+const AnimationComponents: Record<Exclude<AnimationType, 'custom'>, React.ComponentType<{ intensity: AnimationIntensity }>> = {
   snowfall: Snowfall,
   hearts: Hearts,
   leaves: Leaves,
@@ -38,6 +55,7 @@ export function FestivalOverlay({
   greeting,
   showBanner = true,
   showAnimations = true,
+  customAnimationConfig,
 }: FestivalOverlayProps) {
   const [bannerDismissed, setBannerDismissed] = useState(false)
   const [animationsDisabled, setAnimationsDisabled] = useState(false)
@@ -84,7 +102,9 @@ export function FestivalOverlay({
     return null
   }
 
-  const AnimationComponent = AnimationComponents[festival.animation]
+  // Check if this is a custom animation type
+  const isCustomAnimation = festival.animation === 'custom'
+  const AnimationComponent = isCustomAnimation ? null : AnimationComponents[festival.animation as Exclude<AnimationType, 'custom'>]
 
   return (
     <>
@@ -94,7 +114,10 @@ export function FestivalOverlay({
       )}
 
       {/* Animation Overlay */}
-      {showAnimations && !animationsDisabled && AnimationComponent && (
+      {showAnimations && !animationsDisabled && isCustomAnimation && (
+        <CustomAnimation intensity={festival.intensity} config={customAnimationConfig} />
+      )}
+      {showAnimations && !animationsDisabled && !isCustomAnimation && AnimationComponent && (
         <AnimationComponent intensity={festival.intensity} />
       )}
 

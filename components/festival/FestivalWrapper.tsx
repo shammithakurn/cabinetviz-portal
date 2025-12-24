@@ -5,9 +5,25 @@ import { useSearchParams } from 'next/navigation'
 import { FestivalOverlay } from './FestivalOverlay'
 import type { Festival } from '@/lib/festivals'
 
+interface AnimationConfig {
+  elements: { elementId: string; weight: number }[]
+  props: {
+    size: { min: number; max: number }
+    speed: { min: number; max: number }
+    rotation: boolean
+    rotationSpeed: number
+    fade: boolean
+    fadeStart: number
+    swing: boolean
+    swingAmount: number
+    density: number
+  }
+}
+
 interface FestivalResponse {
   success: boolean
   festival: Festival | null
+  customAnimationConfig?: AnimationConfig
   country?: {
     code: string
     name: string
@@ -22,6 +38,7 @@ interface GreetingResponse {
 function FestivalWrapperInner() {
   const [festival, setFestival] = useState<Festival | null>(null)
   const [greeting, setGreeting] = useState<string | undefined>(undefined)
+  const [customAnimationConfig, setCustomAnimationConfig] = useState<AnimationConfig | undefined>(undefined)
   const [isLoading, setIsLoading] = useState(true)
   const searchParams = useSearchParams()
 
@@ -43,6 +60,11 @@ function FestivalWrapperInner() {
 
         if (festivalData.success && festivalData.festival) {
           setFestival(festivalData.festival)
+
+          // Set custom animation config if available
+          if (festivalData.customAnimationConfig) {
+            setCustomAnimationConfig(festivalData.customAnimationConfig)
+          }
 
           // Try to get Claude-generated greeting
           try {
@@ -70,7 +92,15 @@ function FestivalWrapperInner() {
     return null
   }
 
-  return <FestivalOverlay festival={festival} greeting={greeting} showBanner={true} showAnimations={true} />
+  return (
+    <FestivalOverlay
+      festival={festival}
+      greeting={greeting}
+      showBanner={true}
+      showAnimations={true}
+      customAnimationConfig={customAnimationConfig}
+    />
+  )
 }
 
 export function FestivalWrapper() {

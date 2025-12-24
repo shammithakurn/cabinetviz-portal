@@ -198,3 +198,69 @@ model ThemeSetting {
   updatedAt   DateTime  @updatedAt
   updatedBy   String?
 }
+
+// ============================================
+// CUSTOM FESTIVALS & EVENTS
+// ============================================
+
+model CustomFestival {
+  id            String    @id @default(cuid())
+  name          String
+  displayName   String
+
+  // Date configuration
+  startDate     DateTime  // Specific start date
+  endDate       DateTime  // Specific end date (calculated from duration)
+  duration      Int       @default(1) // Number of days
+  isRecurring   Boolean   @default(false) // Repeat every year
+
+  // Visual theme - stored as JSON
+  colors        String    // JSON: { primary, secondary, accent }
+
+  // Animation configuration
+  animation     String    // Animation type: snowfall, fireworks, confetti, hearts, diyas, leaves, lanterns, stars, custom
+  intensity     String    @default("medium") // low, medium, high
+  customAnimation String? // JSON: Custom animation configuration with elements
+
+  // Content
+  greeting      String
+  icon          String    // Emoji icon
+  bannerText    String?   // Optional custom banner text
+
+  // Targeting
+  countries     String    // Comma-separated country codes or GLOBAL
+  priority      Int       @default(50) // 1-100, higher = shown first
+
+  // Status
+  isActive      Boolean   @default(true)
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  createdBy     String?
+}
+
+// ============================================
+// ANIMATION ELEMENTS LIBRARY
+// ============================================
+
+model AnimationElement {
+  id            String    @id @default(cuid())
+  name          String
+  category      String    // FESTIVE, NATURE, CELEBRATION, RELIGIOUS, SEASONAL, CUSTOM
+
+  // Element configuration
+  emoji         String?   // Emoji representation
+  svgPath       String?   // SVG path data for custom elements
+  imageUrl      String?   // URL for image-based elements
+
+  // Animation properties - stored as JSON
+  defaultProps  String    // JSON: { size, speed, rotation, fade, etc. }
+
+  // Metadata
+  description   String?
+  tags          String?   // Comma-separated tags for search
+  isBuiltIn     Boolean   @default(false) // System vs user-created
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}

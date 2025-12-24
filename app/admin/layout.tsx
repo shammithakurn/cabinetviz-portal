@@ -106,6 +106,7 @@ export default async function AdminLayout({
             <div className="space-y-1">
               <NavItem href="/admin/reports" icon="📈" label="Reports" />
               <NavItem href="/admin/theme" icon="🎨" label="Theme Settings" />
+              <NavItem href="/admin/festivals" icon="🎉" label="Festivals" />
             </div>
           </div>
 

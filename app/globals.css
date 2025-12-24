@@ -26,6 +26,8 @@
     --input: 37 35 32;
     --ring: 196 167 125;
     --radius: 0.75rem;
+    /* Festival banner offset */
+    --festival-banner-height: 0px;
   }
 
   html {
