@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(dir:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(npx prisma generate:*)",
+      "Bash(npx prisma db push:*)",
+      "Bash(npm run db:seed:*)",
+      "Bash(timeout:*)",
+      "Bash(curl:*)",
+      "Bash(findstr:*)",
+      "Bash(node test-interactive.mjs:*)",
+      "Bash(npx playwright install:*)",
+      "Bash(node test-e2e-flows.mjs:*)",
+      "Bash(node:*)",
+      "Bash(taskkill:*)",
+      "Bash(grep:*)",
+      "Bash(npm run build:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(del /f \"d:\\cabinetviz-portal\\cabinetviz-portal\\nul\")",
+      "Bash(git config:*)",
+      "Bash(git push)",
+      "Bash(git fetch:*)",
+      "Bash(git push:*)",
+      "Bash(npx vercel --prod --yes)",
+      "Bash(npx vercel:*)",
+      "Bash(cat:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,0 +1,200 @@
+// prisma/schema.prisma
+// Database schema for CabinetViz customer portal
+// Updated: Force rebuild
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL")
+}
+
+// ============================================
+// USER & AUTHENTICATION
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String
+  company       String?
+  phone         String?
+  avatar        String?
+  role          String    @default("CUSTOMER") // CUSTOMER, ADMIN, DESIGNER
+
+  // Relationships
+  jobs                Job[]
+  notifications       Notification[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+// ============================================
+// JOBS & PROJECTS
+// ============================================
+
+model Job {
+  id            String      @id @default(cuid())
+  jobNumber     String      @unique // e.g., "JOB-2024-001"
+  title         String
+  description   String?
+  status        String      @default("PENDING") // PENDING, QUOTED, IN_PROGRESS, REVIEW, REVISION, COMPLETED, CANCELLED
+  priority      String      @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+
+  // Project Details
+  projectType   String      // KITCHEN, WARDROBE, BATHROOM_VANITY, ENTERTAINMENT_UNIT, HOME_OFFICE, LAUNDRY, CUSTOM
+  roomType      String?     // L_SHAPED, U_SHAPED, GALLEY, SINGLE_WALL, ISLAND, WALK_IN, REACH_IN, CUSTOM
+
+  // Dimensions
+  roomWidth     Float?
+  roomLength    Float?
+  roomHeight    Float?
+  dimensionUnit String      @default("mm")
+
+  // Style Preferences
+  cabinetStyle  String?
+  materialType  String?
+  colorScheme   String?
+  handleStyle   String?
+
+  // Additional Info
+  budget        Float?
+  deadline      DateTime?
+  notes         String?
+
+  // Package/Pricing
+  package       String      @default("PROFESSIONAL") // BASIC, PROFESSIONAL, PARTNER
+  quotedPrice   Float?
+
+  // Progress Tracking
+  progress      Int         @default(0) // 0-100
+
+  // Relationships
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  files         JobFile[]
+  comments      Comment[]
+  statusHistory StatusHistory[]
+  deliverables  Deliverable[]
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+// ============================================
+// FILES & UPLOADS
+// ============================================
+
+model JobFile {
+  id          String      @id @default(cuid())
+  filename    String
+  originalName String
+  mimeType    String
+  size        Int
+  url         String
+  category    String      // MEASUREMENT, SKETCH, REFERENCE, PHOTO, FLOOR_PLAN, RENDER_3D, DRAWING_2D, CUT_LIST, OTHER
+
+  // Relationships
+  jobId       String
+  job         Job         @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  uploadedAt  DateTime    @default(now())
+}
+
+// ============================================
+// DELIVERABLES
+// ============================================
+
+model Deliverable {
+  id          String            @id @default(cuid())
+  name        String
+  description String?
+  type        String            // RENDER_FRONT, RENDER_PERSPECTIVE, RENDER_TOP, RENDER_DETAIL, DRAWING_ELEVATION, DRAWING_PLAN, DRAWING_SECTION, CUT_LIST, ASSEMBLY_GUIDE, MATERIAL_LIST
+  fileUrl     String
+  fileSize    Int
+  version     Int               @default(1)
+
+  // Relationships
+  jobId       String
+  job         Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime          @default(now())
+}
+
+// ============================================
+// COMMENTS & COMMUNICATION
+// ============================================
+
+model Comment {
+  id          String    @id @default(cuid())
+  content     String
+  authorName  String
+  authorRole  String    // CUSTOMER, ADMIN, DESIGNER
+  isInternal  Boolean   @default(false) // Internal notes not visible to customer
+
+  // Relationships
+  jobId       String
+  job         Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime  @default(now())
+}
+
+// ============================================
+// STATUS HISTORY
+// ============================================
+
+model StatusHistory {
+  id          String    @id @default(cuid())
+  fromStatus  String?
+  toStatus    String
+  note        String?
+  changedBy   String
+
+  // Relationships
+  jobId       String
+  job         Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  changedAt   DateTime  @default(now())
+}
+
+// ============================================
+// NOTIFICATIONS
+// ============================================
+
+model Notification {
+  id          String    @id @default(cuid())
+  title       String
+  message     String
+  type        String    // JOB_CREATED, STATUS_UPDATE, NEW_COMMENT, DELIVERABLE_READY, QUOTE_SENT, PAYMENT_RECEIVED
+  isRead      Boolean   @default(false)
+  link        String?
+
+  // Relationships
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime  @default(now())
+}
+
+// ============================================
+// THEME SETTINGS
+// ============================================
+
+model ThemeSetting {
+  id          String    @id @default(cuid())
+  key         String    @unique
+  value       String    // JSON string for complex values
+  category    String    // GENERAL, COLORS, TYPOGRAPHY, HERO, SERVICES, PRICING, TESTIMONIALS, FOOTER, IMAGES, SEO
+  label       String    // Human-readable label
+  type        String    // TEXT, TEXTAREA, COLOR, IMAGE, SELECT, NUMBER, BOOLEAN, JSON
+  description String?
+  options     String?   // JSON string for SELECT options
+
+  updatedAt   DateTime  @updatedAt
+  updatedBy   String?
+}

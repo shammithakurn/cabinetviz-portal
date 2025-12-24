@@ -1,0 +1,2029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CabinetViz | 3D Cabinet Design & Visualization for Tradespeople</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-cream: #F7F4EF;
+            --color-warm-white: #FDFBF7;
+            --color-charcoal: #2A2A2A;
+            --color-walnut: #5D4E37;
+            --color-walnut-light: #8B7355;
+            --color-oak: #C4A77D;
+            --color-oak-light: #E8D5B7;
+            --color-accent: #B8860B;
+            --color-text: #3D3D3D;
+            --color-text-light: #6B6B6B;
+            --shadow-soft: 0 4px 20px rgba(93, 78, 55, 0.08);
+            --shadow-medium: 0 8px 40px rgba(93, 78, 55, 0.12);
+            --shadow-strong: 0 20px 60px rgba(93, 78, 55, 0.15);
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--color-warm-white);
+            color: var(--color-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        /* Grain Overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1.25rem 4%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(253, 251, 247, 0.85);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            border-bottom: 1px solid rgba(93, 78, 55, 0.08);
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--color-walnut);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--color-walnut) 0%, var(--color-oak) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--color-text);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--color-accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-cta {
+            background: var(--color-walnut);
+            color: white !important;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-sm);
+            transition: all 0.3s ease !important;
+        }
+
+        .nav-cta:hover {
+            background: var(--color-charcoal);
+            transform: translateY(-2px);
+        }
+
+        .nav-cta::after {
+            display: none !important;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 8rem 4% 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 55%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--color-oak-light) 0%, var(--color-cream) 100%);
+            clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
+            z-index: -1;
+        }
+
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            right: 10%;
+            width: 300px;
+            height: 300px;
+            border: 2px solid var(--color-oak);
+            border-radius: 50%;
+            opacity: 0.3;
+        }
+
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            bottom: 15%;
+            right: 25%;
+            width: 150px;
+            height: 150px;
+            background: var(--color-walnut);
+            opacity: 0.1;
+            transform: rotate(45deg);
+        }
+
+        .hero-content {
+            max-width: 600px;
+            animation: fadeInUp 1s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--color-oak-light);
+            color: var(--color-walnut);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            color: var(--color-charcoal);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 span {
+            color: var(--color-walnut);
+            position: relative;
+        }
+
+        .hero h1 span::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: var(--color-oak-light);
+            z-index: -1;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--color-text-light);
+            margin-bottom: 2rem;
+            max-width: 500px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--color-walnut);
+            color: white;
+            box-shadow: 0 4px 15px rgba(93, 78, 55, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--color-charcoal);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(93, 78, 55, 0.35);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--color-walnut);
+            border: 2px solid var(--color-walnut);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-walnut);
+            color: white;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+            margin-top: 3.5rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(93, 78, 55, 0.15);
+        }
+
+        .stat {
+            text-align: left;
+        }
+
+        .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--color-walnut);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--color-text-light);
+        }
+
+        .hero-image {
+            position: absolute;
+            right: 6%;
+            top: 55%;
+            transform: translateY(-50%);
+            width: 45%;
+            max-width: 600px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(-50%) translateX(0); }
+            50% { transform: translateY(-52%) translateX(-10px); }
+        }
+
+        .hero-image img {
+            width: 100%;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .hero-3d-element {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--color-walnut) 0%, var(--color-walnut-light) 100%);
+            border-radius: var(--radius-md);
+            bottom: 15%;
+            right: 45%;
+            transform: rotate(-15deg);
+            box-shadow: var(--shadow-medium);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: rotate(-15deg) scale(1); }
+            50% { transform: rotate(-15deg) scale(1.05); }
+        }
+
+        /* Problem Section */
+        .problem-section {
+            padding: 6rem 4%;
+            background: var(--color-cream);
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 4rem;
+        }
+
+        .section-tag {
+            display: inline-block;
+            color: var(--color-accent);
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            color: var(--color-charcoal);
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: var(--color-text-light);
+            font-size: 1.1rem;
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .problem-card {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-soft);
+            transition: all 0.4s ease;
+            border: 1px solid rgba(93, 78, 55, 0.08);
+        }
+
+        .problem-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .problem-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--color-oak-light) 0%, var(--color-cream) 100%);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .problem-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.75rem;
+            color: var(--color-charcoal);
+        }
+
+        .problem-card p {
+            color: var(--color-text-light);
+            font-size: 0.95rem;
+        }
+
+        /* Before/After Section */
+        .before-after-section {
+            padding: 6rem 4%;
+            background: var(--color-warm-white);
+        }
+
+        .ba-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .ba-showcase {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .ba-item {
+            position: relative;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-medium);
+            cursor: pointer;
+            transition: transform 0.4s ease;
+        }
+
+        .ba-item:hover {
+            transform: scale(1.02);
+        }
+
+        .ba-slider {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4/3;
+            overflow: hidden;
+        }
+
+        .ba-before, .ba-after {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .ba-before {
+            background: linear-gradient(135deg, #e8e8e8 0%, #d0d0d0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .ba-before-content {
+            text-align: center;
+            color: var(--color-text-light);
+        }
+
+        .ba-before-icon {
+            font-size: 4rem;
+            opacity: 0.5;
+        }
+
+        .ba-after {
+            clip-path: inset(0 0 0 50%);
+            background: linear-gradient(135deg, var(--color-oak-light) 0%, var(--color-cream) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ba-after-content {
+            font-size: 3rem;
+        }
+
+        .ba-handle {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 4px;
+            background: white;
+            cursor: ew-resize;
+            z-index: 10;
+            transform: translateX(-50%);
+        }
+
+        .ba-handle::before {
+            content: '⟷';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            font-size: 1.2rem;
+            color: var(--color-walnut);
+        }
+
+        .ba-labels {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            right: 1rem;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .ba-label {
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .ba-description {
+            padding: 1.5rem;
+            background: white;
+        }
+
+        .ba-description h4 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--color-charcoal);
+        }
+
+        .ba-description p {
+            color: var(--color-text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Services Section */
+        .services-section {
+            padding: 6rem 4%;
+            background: linear-gradient(180deg, var(--color-cream) 0%, var(--color-warm-white) 100%);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--color-walnut) 0%, var(--color-oak) 100%);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .service-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--color-oak-light) 0%, var(--color-cream) 100%);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .service-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: var(--color-charcoal);
+        }
+
+        .service-card p {
+            color: var(--color-text-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .service-features {
+            list-style: none;
+        }
+
+        .service-features li {
+            padding: 0.5rem 0;
+            color: var(--color-text);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .service-features li::before {
+            content: '✓';
+            color: var(--color-accent);
+            font-weight: bold;
+        }
+
+        /* Pricing Section */
+        .pricing-section {
+            padding: 6rem 4%;
+            background: var(--color-charcoal);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pricing-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--color-walnut) 0%, transparent 70%);
+            opacity: 0.3;
+        }
+
+        .pricing-section .section-header {
+            color: white;
+        }
+
+        .pricing-section .section-header h2 {
+            color: white;
+        }
+
+        .pricing-section .section-header p {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .pricing-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            transition: all 0.4s ease;
+        }
+
+        .pricing-card:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-5px);
+        }
+
+        .pricing-card.featured {
+            background: white;
+            color: var(--color-text);
+            transform: scale(1.05);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .pricing-card.featured:hover {
+            transform: scale(1.07);
+        }
+
+        .pricing-badge {
+            display: inline-block;
+            background: var(--color-accent);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-card.featured h3 {
+            color: var(--color-charcoal);
+        }
+
+        .pricing-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .pricing-card.featured .pricing-subtitle {
+            color: var(--color-text-light);
+        }
+
+        .pricing-price {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-card.featured .pricing-price {
+            color: var(--color-walnut);
+        }
+
+        .pricing-price span {
+            font-size: 1rem;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 400;
+            opacity: 0.7;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin: 2rem 0;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .pricing-card.featured .pricing-features {
+            border-color: rgba(0,0,0,0.1);
+        }
+
+        .pricing-features li {
+            padding: 0.6rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            color: var(--color-oak);
+            font-weight: bold;
+        }
+
+        .pricing-card.featured .pricing-features li::before {
+            color: var(--color-accent);
+        }
+
+        .pricing-card .btn {
+            width: 100%;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .pricing-card .btn-primary {
+            background: var(--color-oak);
+        }
+
+        .pricing-card .btn-primary:hover {
+            background: var(--color-accent);
+        }
+
+        .pricing-card.featured .btn-primary {
+            background: var(--color-walnut);
+        }
+
+        /* Process Section */
+        .process-section {
+            padding: 6rem 4%;
+            background: var(--color-warm-white);
+        }
+
+        .process-timeline {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .process-timeline::before {
+            content: '';
+            position: absolute;
+            left: 40px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--color-walnut) 0%, var(--color-oak-light) 100%);
+        }
+
+        .process-step {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .process-number {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border: 3px solid var(--color-walnut);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--color-walnut);
+            flex-shrink: 0;
+            z-index: 1;
+        }
+
+        .process-content {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-soft);
+            flex: 1;
+        }
+
+        .process-content h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.75rem;
+            color: var(--color-charcoal);
+        }
+
+        .process-content p {
+            color: var(--color-text-light);
+        }
+
+        /* Testimonials */
+        .testimonials-section {
+            padding: 6rem 4%;
+            background: var(--color-cream);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .testimonial-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+            position: relative;
+        }
+
+        .testimonial-card::before {
+            content: '"';
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 5rem;
+            color: var(--color-oak-light);
+            line-height: 1;
+        }
+
+        .testimonial-stars {
+            color: var(--color-accent);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-text {
+            font-size: 1.05rem;
+            color: var(--color-text);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+            position: relative;
+            z-index: 1;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .testimonial-avatar {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--color-walnut) 0%, var(--color-oak) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .testimonial-info h4 {
+            font-size: 1.1rem;
+            color: var(--color-charcoal);
+        }
+
+        .testimonial-info p {
+            font-size: 0.9rem;
+            color: var(--color-text-light);
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            padding: 6rem 4%;
+            background: var(--color-warm-white);
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: white;
+            border-radius: var(--radius-md);
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+        }
+
+        .faq-question {
+            width: 100%;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-charcoal);
+            transition: background 0.3s ease;
+        }
+
+        .faq-question:hover {
+            background: var(--color-cream);
+        }
+
+        .faq-icon {
+            font-size: 1.5rem;
+            color: var(--color-walnut);
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 300px;
+        }
+
+        .faq-answer p {
+            padding: 0 2rem 1.5rem;
+            color: var(--color-text-light);
+            line-height: 1.7;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 6rem 4%;
+            background: linear-gradient(135deg, var(--color-walnut) 0%, var(--color-charcoal) 100%);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: -100px;
+            width: 400px;
+            height: 400px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .cta-section::after {
+            content: '';
+            position: absolute;
+            bottom: -150px;
+            right: -100px;
+            width: 500px;
+            height: 500px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .cta-section h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .cta-section p {
+            color: rgba(255,255,255,0.8);
+            font-size: 1.15rem;
+            margin-bottom: 2rem;
+        }
+
+        .cta-section .btn-primary {
+            background: white;
+            color: var(--color-walnut);
+            padding: 1.25rem 2.5rem;
+            font-size: 1.1rem;
+        }
+
+        .cta-section .btn-primary:hover {
+            background: var(--color-oak-light);
+            transform: translateY(-3px);
+        }
+
+        /* Contact Form */
+        .contact-section {
+            padding: 6rem 4%;
+            background: var(--color-cream);
+        }
+
+        .contact-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .contact-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--color-charcoal);
+        }
+
+        .contact-info p {
+            color: var(--color-text-light);
+            margin-bottom: 2rem;
+        }
+
+        .contact-details {
+            list-style: none;
+        }
+
+        .contact-details li {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(93, 78, 55, 0.1);
+        }
+
+        .contact-details li:last-child {
+            border-bottom: none;
+        }
+
+        .contact-icon {
+            width: 45px;
+            height: 45px;
+            background: var(--color-oak-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .contact-form {
+            background: white;
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--color-charcoal);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid rgba(93, 78, 55, 0.15);
+            border-radius: var(--radius-sm);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--color-walnut);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .contact-form .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--color-charcoal);
+            color: white;
+            padding: 4rem 4% 2rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-brand .logo {
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .footer-brand p {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .footer-column h4 {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column ul li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-column ul a {
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-column ul a:hover {
+            color: var(--color-oak);
+        }
+
+        .footer-bottom {
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: var(--color-oak);
+            transform: translateY(-3px);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .mobile-menu-btn span {
+            width: 25px;
+            height: 2px;
+            background: var(--color-walnut);
+            transition: all 0.3s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-image {
+                display: none;
+            }
+
+            .hero-bg {
+                width: 100%;
+                clip-path: none;
+                opacity: 0.5;
+            }
+
+            .hero-content {
+                max-width: 100%;
+                text-align: center;
+            }
+
+            .hero-stats {
+                justify-content: center;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: flex;
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                gap: 1.5rem;
+                align-items: center;
+            }
+
+            .ba-showcase {
+                grid-template-columns: 1fr;
+            }
+
+            .pricing-card.featured {
+                transform: scale(1);
+            }
+
+            .process-timeline::before {
+                left: 20px;
+            }
+
+            .process-number {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="#" class="logo">
+            <div class="logo-icon">⬡</div>
+            CabinetViz
+        </a>
+        <ul class="nav-links">
+            <li><a href="#services">Services</a></li>
+            <li><a href="#portfolio">Portfolio</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#process">Process</a></li>
+            <li><a href="#contact" class="nav-cta">Get Started</a></li>
+        </ul>
+        <button class="mobile-menu-btn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                🎯 For Cabinet Makers & Joiners
+            </div>
+            <h1>Win More Jobs with <span>Stunning 3D</span> Cabinet Designs</h1>
+            <p>Help your customers visualize their dream kitchens and wardrobes before a single cut is made. Professional 3D renders and technical drawings that close deals.</p>
+            <div class="hero-buttons">
+                <a href="#contact" class="btn btn-primary">
+                    Get Free Quote
+                    <span>→</span>
+                </a>
+                <a href="#portfolio" class="btn btn-secondary">
+                    View Portfolio
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Projects Delivered</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">48hr</div>
+                    <div class="stat-label">Average Turnaround</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">97%</div>
+                    <div class="stat-label">Client Satisfaction</div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-image">
+            <div style="width: 100%; aspect-ratio: 4/3; background: linear-gradient(135deg, var(--color-oak-light) 0%, #fff 50%, var(--color-cream) 100%); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 6rem; box-shadow: var(--shadow-strong);">
+                🏠
+            </div>
+        </div>
+        <div class="hero-3d-element">📐</div>
+    </section>
+
+    <!-- Problem Section -->
+    <section class="problem-section">
+        <div class="section-header">
+            <span class="section-tag">The Challenge</span>
+            <h2>Why Tradespeople Lose Jobs</h2>
+            <p>Customers struggle to imagine the finished product. A sketch on paper just doesn't cut it anymore.</p>
+        </div>
+        <div class="problem-grid">
+            <div class="problem-card">
+                <div class="problem-icon">😕</div>
+                <h3>Customers Can't Visualize</h3>
+                <p>Verbal descriptions and rough sketches leave customers uncertain. They often choose competitors with better presentations.</p>
+            </div>
+            <div class="problem-card">
+                <div class="problem-icon">💸</div>
+                <h3>Lost Quotes & Revenue</h3>
+                <p>Without professional visuals, you're losing jobs to companies with fancy showrooms and 3D design tools.</p>
+            </div>
+            <div class="problem-card">
+                <div class="problem-icon">⏰</div>
+                <h3>No Time to Learn 3D</h3>
+                <p>You're great at building cabinets, not spending hours learning complex design software.</p>
+            </div>
+            <div class="problem-card">
+                <div class="problem-icon">🔄</div>
+                <h3>Costly Revisions</h3>
+                <p>Misunderstandings lead to expensive changes mid-project when customers see something different than expected.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Before/After Section -->
+    <section class="before-after-section" id="portfolio">
+        <div class="ba-container">
+            <div class="section-header">
+                <span class="section-tag">The Transformation</span>
+                <h2>From Sketch to Stunning 3D</h2>
+                <p>See how simple measurements and ideas transform into presentation-ready visuals that win jobs.</p>
+            </div>
+            <div class="ba-showcase">
+                <div class="ba-item">
+                    <div class="ba-slider">
+                        <div class="ba-before">
+                            <div class="ba-before-content">
+                                <div class="ba-before-icon">📝</div>
+                                <p>Your Sketch</p>
+                            </div>
+                        </div>
+                        <div class="ba-after">
+                            <div class="ba-after-content">🍳</div>
+                        </div>
+                        <div class="ba-handle"></div>
+                        <div class="ba-labels">
+                            <span class="ba-label">Before</span>
+                            <span class="ba-label">After</span>
+                        </div>
+                    </div>
+                    <div class="ba-description">
+                        <h4>Modern Kitchen Island</h4>
+                        <p>Transformed a rough measurement sketch into photorealistic 3D render with material options.</p>
+                    </div>
+                </div>
+                <div class="ba-item">
+                    <div class="ba-slider">
+                        <div class="ba-before">
+                            <div class="ba-before-content">
+                                <div class="ba-before-icon">📏</div>
+                                <p>Basic Dimensions</p>
+                            </div>
+                        </div>
+                        <div class="ba-after">
+                            <div class="ba-after-content">👔</div>
+                        </div>
+                        <div class="ba-handle"></div>
+                        <div class="ba-labels">
+                            <span class="ba-label">Before</span>
+                            <span class="ba-label">After</span>
+                        </div>
+                    </div>
+                    <div class="ba-description">
+                        <h4>Walk-in Wardrobe</h4>
+                        <p>Client provided room dimensions. Delivered 3 design options with lighting simulation.</p>
+                    </div>
+                </div>
+                <div class="ba-item">
+                    <div class="ba-slider">
+                        <div class="ba-before">
+                            <div class="ba-before-content">
+                                <div class="ba-before-icon">✏️</div>
+                                <p>Rough Idea</p>
+                            </div>
+                        </div>
+                        <div class="ba-after">
+                            <div class="ba-after-content">📺</div>
+                        </div>
+                        <div class="ba-handle"></div>
+                        <div class="ba-labels">
+                            <span class="ba-label">Before</span>
+                            <span class="ba-label">After</span>
+                        </div>
+                    </div>
+                    <div class="ba-description">
+                        <h4>Entertainment Unit</h4>
+                        <p>Pinterest inspiration turned into custom design with cable management visualization.</p>
+                    </div>
+                </div>
+                <div class="ba-item">
+                    <div class="ba-slider">
+                        <div class="ba-before">
+                            <div class="ba-before-content">
+                                <div class="ba-before-icon">📐</div>
+                                <p>Floor Plan</p>
+                            </div>
+                        </div>
+                        <div class="ba-after">
+                            <div class="ba-after-content">🚿</div>
+                        </div>
+                        <div class="ba-handle"></div>
+                        <div class="ba-labels">
+                            <span class="ba-label">Before</span>
+                            <span class="ba-label">After</span>
+                        </div>
+                    </div>
+                    <div class="ba-description">
+                        <h4>Bathroom Vanity</h4>
+                        <p>Complex space with plumbing constraints visualized before production began.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services-section" id="services">
+        <div class="section-header">
+            <span class="section-tag">What I Offer</span>
+            <h2>Complete Design Services</h2>
+            <p>Everything you need to impress clients and streamline your workshop production.</p>
+        </div>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">🎨</div>
+                <h3>3D Photorealistic Renders</h3>
+                <p>Stunning visualizations that let customers see exactly what they're getting before you start building.</p>
+                <ul class="service-features">
+                    <li>Multiple angle views</li>
+                    <li>Material & color options</li>
+                    <li>Realistic lighting</li>
+                    <li>High-res for presentations</li>
+                </ul>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">📐</div>
+                <h3>2D Technical Drawings</h3>
+                <p>Precise workshop drawings with all measurements, cut lists, and assembly details your team needs.</p>
+                <ul class="service-features">
+                    <li>Detailed dimensions</li>
+                    <li>Cut list optimization</li>
+                    <li>Assembly instructions</li>
+                    <li>Hardware specifications</li>
+                </ul>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🔄</div>
+                <h3>Revision Rounds</h3>
+                <p>Quick turnaround on changes so you can show clients multiple options and close the deal faster.</p>
+                <ul class="service-features">
+                    <li>Fast 24hr revisions</li>
+                    <li>Material swaps</li>
+                    <li>Layout adjustments</li>
+                    <li>Color variations</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing-section" id="pricing">
+        <div class="section-header">
+            <span class="section-tag">Simple Pricing</span>
+            <h2>Choose Your Package</h2>
+            <p>Transparent pricing with no hidden fees. Pay per project or save with a monthly retainer.</p>
+        </div>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <h3>Basic</h3>
+                <p class="pricing-subtitle">Perfect for simple jobs</p>
+                <div class="pricing-price">$79<span>/project</span></div>
+                <ul class="pricing-features">
+                    <li>Single room/unit design</li>
+                    <li>2 photorealistic renders</li>
+                    <li>Basic 2D drawing</li>
+                    <li>1 revision round</li>
+                    <li>72-hour delivery</li>
+                </ul>
+                <a href="#contact" class="btn btn-primary">Get Started</a>
+            </div>
+            <div class="pricing-card featured">
+                <span class="pricing-badge">Most Popular</span>
+                <h3>Professional</h3>
+                <p class="pricing-subtitle">Best for client presentations</p>
+                <div class="pricing-price">$149<span>/project</span></div>
+                <ul class="pricing-features">
+                    <li>Complete room design</li>
+                    <li>5 photorealistic renders</li>
+                    <li>Detailed technical drawings</li>
+                    <li>3 revision rounds</li>
+                    <li>48-hour delivery</li>
+                    <li>Material options included</li>
+                </ul>
+                <a href="#contact" class="btn btn-primary">Get Started</a>
+            </div>
+            <div class="pricing-card">
+                <h3>Partner</h3>
+                <p class="pricing-subtitle">For regular workflow</p>
+                <div class="pricing-price">$399<span>/month</span></div>
+                <ul class="pricing-features">
+                    <li>Up to 5 projects/month</li>
+                    <li>Unlimited renders per project</li>
+                    <li>Full technical package</li>
+                    <li>Unlimited revisions</li>
+                    <li>24-hour priority delivery</li>
+                    <li>Dedicated support line</li>
+                </ul>
+                <a href="#contact" class="btn btn-primary">Get Started</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section class="process-section" id="process">
+        <div class="section-header">
+            <span class="section-tag">How It Works</span>
+            <h2>Simple 4-Step Process</h2>
+            <p>From your measurements to presentation-ready visuals in as little as 48 hours.</p>
+        </div>
+        <div class="process-timeline">
+            <div class="process-step">
+                <div class="process-number">1</div>
+                <div class="process-content">
+                    <h3>Send Your Brief</h3>
+                    <p>Share your measurements, sketches, photos of the space, and any inspiration images. Don't worry about being perfect – I'll work with whatever you have.</p>
+                </div>
+            </div>
+            <div class="process-step">
+                <div class="process-number">2</div>
+                <div class="process-content">
+                    <h3>Quick Consultation</h3>
+                    <p>Brief call or message to clarify details, discuss material options, and understand your customer's style preferences. Usually takes 15 minutes.</p>
+                </div>
+            </div>
+            <div class="process-step">
+                <div class="process-number">3</div>
+                <div class="process-content">
+                    <h3>Receive Your Designs</h3>
+                    <p>Get your 3D renders and technical drawings delivered to your inbox. High-resolution files ready to share with your customer or send to the workshop.</p>
+                </div>
+            </div>
+            <div class="process-step">
+                <div class="process-number">4</div>
+                <div class="process-content">
+                    <h3>Revise & Close the Deal</h3>
+                    <p>Need changes? Quick turnaround on revisions. Show your customer the updated design and watch their confidence (and your conversion rate) soar.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials-section">
+        <div class="section-header">
+            <span class="section-tag">Happy Clients</span>
+            <h2>What Tradespeople Say</h2>
+            <p>Join hundreds of cabinet makers who've transformed their sales process.</p>
+        </div>
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">"Used to lose quotes because customers couldn't picture the finished product. Now I close 7 out of 10 jobs. The 3D renders pay for themselves on the first quote."</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">MT</div>
+                    <div class="testimonial-info">
+                        <h4>Mike Thompson</h4>
+                        <p>Thompson Joinery, Auckland</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">"The technical drawings are spot-on. My workshop team loves them – no more guessing or calling back for clarifications. Saves us hours every project."</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">SR</div>
+                    <div class="testimonial-info">
+                        <h4>Sarah Roberts</h4>
+                        <p>Custom Cabinets Co.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">"Fast, professional, and actually understands what cabinet makers need. The renders look better than what some big showrooms offer. Highly recommend."</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">JD</div>
+                    <div class="testimonial-info">
+                        <h4>James Davies</h4>
+                        <p>Davies Kitchen Fitters</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <div class="section-header">
+            <span class="section-tag">Questions?</span>
+            <h2>Frequently Asked Questions</h2>
+        </div>
+        <div class="faq-container">
+            <div class="faq-item">
+                <button class="faq-question">
+                    What do I need to send you to get started?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Just send me what you have – rough sketches, measurements, photos of the space, and any inspiration images from Pinterest or magazines. I can work with hand-drawn sketches on paper, photos of napkin drawings, or even just dimensions in a text message. The more detail, the faster I can work, but I'll ask clarifying questions if needed.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    How long does delivery take?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Standard delivery is 72 hours for Basic, 48 hours for Professional packages. Partner clients get 24-hour priority. Need it faster? Rush delivery is available for an additional fee – just let me know when you submit your brief.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    Can I show the renders to my customers?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Absolutely – that's the whole point! You get full rights to use the renders in your customer presentations, quotes, and marketing. They're high-resolution files perfect for printing or showing on a tablet during client meetings.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    What if I need changes after seeing the design?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Every package includes revision rounds. Basic includes 1 round, Professional includes 3 rounds, and Partner gets unlimited revisions. A revision round covers things like material changes, color swaps, or minor layout adjustments. Major redesigns are quoted separately.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    Do you do other furniture besides cabinets?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Yes! While I specialize in kitchens and wardrobes, I also design bathroom vanities, entertainment units, home offices, laundry rooms, and custom built-in furniture. If it involves cabinetry or joinery work, I can help you visualize it.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2>Ready to Win More Jobs?</h2>
+            <p>Stop losing quotes to competitors with fancy showrooms. Give your customers the confidence to say yes with professional 3D visualizations.</p>
+            <a href="#contact" class="btn btn-primary">
+                Get Your Free Quote
+                <span>→</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section" id="contact">
+        <div class="contact-container">
+            <div class="contact-info">
+                <h3>Let's Talk About Your Project</h3>
+                <p>Send me your brief and I'll get back to you within 24 hours with a quote. No obligation, no pressure – just a straightforward conversation about how I can help you win more jobs.</p>
+                <ul class="contact-details">
+                    <li>
+                        <div class="contact-icon">📧</div>
+                        <div>
+                            <strong>Email</strong><br>
+                            hello@cabinetviz.com
+                        </div>
+                    </li>
+                    <li>
+                        <div class="contact-icon">📱</div>
+                        <div>
+                            <strong>WhatsApp</strong><br>
+                            +64 21 123 4567
+                        </div>
+                    </li>
+                    <li>
+                        <div class="contact-icon">⏰</div>
+                        <div>
+                            <strong>Response Time</strong><br>
+                            Within 24 hours
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <form class="contact-form">
+                <div class="form-group">
+                    <label for="name">Your Name</label>
+                    <input type="text" id="name" placeholder="John Smith">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="john@yourcompany.com">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone (Optional)</label>
+                    <input type="tel" id="phone" placeholder="+64 21 000 0000">
+                </div>
+                <div class="form-group">
+                    <label for="service">Service Interested In</label>
+                    <select id="service">
+                        <option value="">Select a package...</option>
+                        <option value="basic">Basic ($79/project)</option>
+                        <option value="professional">Professional ($149/project)</option>
+                        <option value="partner">Partner ($399/month)</option>
+                        <option value="custom">Custom Quote</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="message">Tell Me About Your Project</label>
+                    <textarea id="message" placeholder="Describe the project, share any measurements or details you have..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    Send Message
+                    <span>→</span>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <a href="#" class="logo">
+                    <div class="logo-icon">⬡</div>
+                    CabinetViz
+                </a>
+                <p>Professional 3D visualization services for cabinet makers, joiners, and kitchen fitters. Helping tradespeople win more jobs with stunning visual presentations.</p>
+            </div>
+            <div class="footer-column">
+                <h4>Services</h4>
+                <ul>
+                    <li><a href="#services">3D Renders</a></li>
+                    <li><a href="#services">Technical Drawings</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="#portfolio">Portfolio</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#process">How It Works</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Refund Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 CabinetViz. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#">f</a>
+                <a href="#">in</a>
+                <a href="#">ig</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // FAQ Accordion
+        document.querySelectorAll('.faq-question').forEach(button => {
+            button.addEventListener('click', () => {
+                const item = button.parentElement;
+                const isActive = item.classList.contains('active');
+                
+                // Close all items
+                document.querySelectorAll('.faq-item').forEach(faq => {
+                    faq.classList.remove('active');
+                });
+                
+                // Open clicked item if it wasn't active
+                if (!isActive) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        // Before/After Slider
+        document.querySelectorAll('.ba-slider').forEach(slider => {
+            const handle = slider.querySelector('.ba-handle');
+            const after = slider.querySelector('.ba-after');
+            let isDragging = false;
+
+            const updateSlider = (x) => {
+                const rect = slider.getBoundingClientRect();
+                let percentage = ((x - rect.left) / rect.width) * 100;
+                percentage = Math.max(0, Math.min(100, percentage));
+                
+                handle.style.left = percentage + '%';
+                after.style.clipPath = `inset(0 0 0 ${percentage}%)`;
+            };
+
+            handle.addEventListener('mousedown', () => isDragging = true);
+            document.addEventListener('mouseup', () => isDragging = false);
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) updateSlider(e.clientX);
+            });
+
+            // Touch support
+            handle.addEventListener('touchstart', () => isDragging = true);
+            document.addEventListener('touchend', () => isDragging = false);
+            document.addEventListener('touchmove', (e) => {
+                if (isDragging) updateSlider(e.touches[0].clientX);
+            });
+        });
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Form submission (demo)
+        document.querySelector('.contact-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Thanks for your message! I\'ll get back to you within 24 hours.');
+        });
+
+        // Nav scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.style.boxShadow = '0 2px 20px rgba(0,0,0,0.1)';
+            } else {
+                nav.style.boxShadow = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

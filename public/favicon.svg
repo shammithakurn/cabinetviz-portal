@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="topGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E8BC4A"/>
+      <stop offset="50%" stop-color="#D4A72C"/>
+      <stop offset="100%" stop-color="#C4A77D"/>
+    </linearGradient>
+    <linearGradient id="leftGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B7355"/>
+      <stop offset="100%" stop-color="#5D4E37"/>
+    </linearGradient>
+    <linearGradient id="rightGrad" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#C4A77D"/>
+      <stop offset="100%" stop-color="#9A8565"/>
+    </linearGradient>
+    <linearGradient id="innerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E1C1A"/>
+      <stop offset="100%" stop-color="#121110"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="12" fill="#121110"/>
+  <g transform="translate(32, 32)">
+    <polygon points="0,-18 15,-9 0,0 -15,-9" fill="url(#topGrad)"/>
+    <polygon points="-15,-9 0,0 0,18 -15,9" fill="url(#leftGrad)"/>
+    <polygon points="0,0 15,-9 15,9 0,18" fill="url(#rightGrad)"/>
+    <polygon points="0,-12 10,-6 0,0 -10,-6" fill="url(#innerGrad)"/>
+    <polygon points="-10,-6 0,0 0,12 -10,5" fill="#121110"/>
+    <polygon points="0,0 10,-6 10,5 0,12" fill="#1A1816"/>
+    <circle cx="11" cy="4" r="1.5" fill="#D4A72C"/>
+    <line x1="0" y1="-18" x2="15" y2="-9" stroke="#E8E4DD" stroke-width="0.5" opacity="0.5"/>
+    <line x1="0" y1="-18" x2="-15" y2="-9" stroke="#E8E4DD" stroke-width="0.5" opacity="0.4"/>
+  </g>
+</svg>
