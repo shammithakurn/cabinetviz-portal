@@ -14,6 +14,7 @@ import {
   getProjectTypeIcon,
   getProjectTypeLabel,
 } from '@/lib/utils'
+import { JobFileUploader } from '@/components/JobFileUploader'
 
 export default async function JobDetailPage({
   params,
@@ -158,12 +159,12 @@ export default async function JobDetailPage({
             <h2 className="text-lg font-bold text-text mb-4">Your Uploaded Files</h2>
 
             {uploadedFiles.length === 0 ? (
-              <div className="text-center py-10 text-text-light">
-                <div className="text-5xl mb-3">📁</div>
-                <p className="font-medium">No files uploaded</p>
+              <div className="text-center py-6 text-text-light">
+                <div className="text-4xl mb-2">📁</div>
+                <p className="font-medium">No files uploaded yet</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 mb-6">
                 {uploadedFiles.map((file) => (
                   <div
                     key={file.id}
@@ -184,6 +185,12 @@ export default async function JobDetailPage({
                 ))}
               </div>
             )}
+
+            {/* Upload More Files */}
+            <div className="pt-4 border-t border-border">
+              <h3 className="text-sm font-semibold text-text mb-3">Upload Additional Files</h3>
+              <JobFileUploader jobId={job.id} />
+            </div>
           </div>
 
           {/* Comments */}
