@@ -58,8 +58,8 @@ export default async function HomePage() {
         style={{ top: 'var(--festival-banner-height, 0px)' }}
       >
         <Link href="/" className="flex items-center gap-2">
-          {theme.site_logo ? (
-            <img src={theme.site_logo} alt={theme.site_name} className="h-9" />
+          {(theme.image_logo || theme.site_logo) ? (
+            <img src={theme.image_logo || theme.site_logo} alt={theme.site_name} className="h-9" />
           ) : (
             <>
               <img src="/logo-icon.svg" alt={theme.site_name} className="w-9 h-9" />
@@ -153,8 +153,8 @@ export default async function HomePage() {
 
         {/* Hero Image */}
         <div className="absolute right-[6%] top-1/2 -translate-y-1/2 w-[45%] max-w-[600px] hidden lg:block animate-float">
-          {theme.hero_image ? (
-            <img src={theme.hero_image} alt="Hero" className="w-full rounded-3xl shadow-2xl" />
+          {(theme.image_hero_main || theme.hero_image) ? (
+            <img src={theme.image_hero_main || theme.hero_image} alt="Hero" className="w-full rounded-3xl shadow-2xl" />
           ) : (
             <div className="w-full aspect-[4/3] bg-gradient-to-br from-dark-elevated via-dark-surface to-cream rounded-3xl shadow-2xl flex items-center justify-center border border-border">
               <div className="text-8xl">{theme.hero_icon}</div>
@@ -316,8 +316,8 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              {theme.site_logo ? (
-                <img src={theme.site_logo} alt={theme.site_name} className="h-9" />
+              {(theme.image_logo || theme.site_logo) ? (
+                <img src={theme.image_logo || theme.site_logo} alt={theme.site_name} className="h-9" />
               ) : (
                 <>
                   <img src="/logo-icon.svg" alt={theme.site_name} className="w-9 h-9" />

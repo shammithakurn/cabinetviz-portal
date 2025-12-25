@@ -12,6 +12,21 @@ export interface ThemeSettings {
   contact_email: string
   contact_phone: string
 
+  // Images (from IMAGES category)
+  image_logo: string
+  image_logo_dark: string
+  image_favicon: string
+  image_hero_background: string
+  image_hero_main: string
+  image_about: string
+  image_portfolio_1: string
+  image_portfolio_2: string
+  image_portfolio_3: string
+  image_portfolio_4: string
+  image_cta_background: string
+  image_testimonial_bg: string
+  image_og_default: string
+
   // Colors
   color_primary: string
   color_secondary: string
@@ -107,6 +122,21 @@ export const defaultThemeSettings: ThemeSettings = {
   favicon: '',
   contact_email: 'hello@cabinetviz.com',
   contact_phone: '+64 21 123 4567',
+
+  // Images
+  image_logo: '/logo.svg',
+  image_logo_dark: '/logo.svg',
+  image_favicon: '/favicon.ico',
+  image_hero_background: '',
+  image_hero_main: '',
+  image_about: '',
+  image_portfolio_1: '',
+  image_portfolio_2: '',
+  image_portfolio_3: '',
+  image_portfolio_4: '',
+  image_cta_background: '',
+  image_testimonial_bg: '',
+  image_og_default: '/og-image.png',
 
   // Colors
   color_primary: '#5D4E37',
