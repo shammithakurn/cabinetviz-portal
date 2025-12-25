@@ -1,13 +1,13 @@
 // app/api/upload/route.ts
-// API route for file uploads
+// API route for file uploads using Vercel Blob
 
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
+import { put } from '@vercel/blob'
 import { prisma } from '@/lib/db'
 import { getCurrentUser } from '@/lib/auth'
+import { MAX_FILE_SIZE_BYTES, MAX_FILE_SIZE_MB, formatFileSize } from '@/lib/constants'
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,29 +39,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Job not found' }, { status: 404 })
     }
 
-    // Create upload directory if it doesn't exist
-    const uploadDir = join(process.cwd(), 'public', 'uploads', jobId)
-    await mkdir(uploadDir, { recursive: true })
+    // Validate file size (Vercel serverless limit - see lib/constants.ts to update)
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      return NextResponse.json({
+        error: `File too large. Maximum size is ${MAX_FILE_SIZE_MB}MB. Your file is ${formatFileSize(file.size)}.`
+      }, { status: 400 })
+    }
 
-    // Generate unique filename
+    // Generate unique filename (matching admin images route format)
     const timestamp = Date.now()
-    const extension = file.name.split('.').pop()
-    const filename = `${timestamp}-${Math.random().toString(36).substring(7)}.${extension}`
-    const filepath = join(uploadDir, filename)
+    const ext = file.name.split('.').pop()?.toLowerCase() || 'bin'
+    const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_').replace(/\.[^.]+$/, '')
+    const filename = `job-${jobId}-${safeName}-${timestamp}.${ext}`
 
-    // Write file to disk
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    await writeFile(filepath, buffer)
+    // Upload to Vercel Blob (using same format as admin images)
+    const blob = await put(filename, file, {
+      access: 'public',
+      addRandomSuffix: false,
+    })
 
     // Save file record to database
     const fileRecord = await prisma.jobFile.create({
       data: {
-        filename,
+        filename: blob.pathname,
         originalName: file.name,
         mimeType: file.type,
         size: file.size,
-        url: `/uploads/${jobId}/${filename}`,
+        url: blob.url,
         category: category || 'OTHER',
         jobId,
       },
@@ -70,8 +74,24 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ file: fileRecord }, { status: 201 })
   } catch (error) {
     console.error('Upload error:', error)
+
+    const errorMessage = error instanceof Error ? error.message : String(error)
+
+    // Check for specific error types
+    if (errorMessage.includes('BLOB_READ_WRITE_TOKEN') || errorMessage.includes('token')) {
+      return NextResponse.json({
+        error: 'Blob storage not configured. Please add BLOB_READ_WRITE_TOKEN to environment variables.'
+      }, { status: 500 })
+    }
+
+    if (errorMessage.includes('Forbidden') || errorMessage.includes('403')) {
+      return NextResponse.json({
+        error: 'Blob storage access denied. Please check your BLOB_READ_WRITE_TOKEN permissions.'
+      }, { status: 403 })
+    }
+
     return NextResponse.json(
-      { error: 'Failed to upload file' },
+      { error: `Failed to upload file: ${errorMessage}` },
       { status: 500 }
     )
   }

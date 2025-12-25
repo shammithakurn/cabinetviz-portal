@@ -49,10 +49,11 @@ export function Leaves({ intensity = 'medium' }: LeavesProps) {
     return () => document.removeEventListener('visibilitychange', handleVisibility)
   }, [])
 
-  if (!isVisible) return null
-
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden z-40">
+    <div
+      className="fixed inset-0 pointer-events-none overflow-hidden z-[45]"
+      style={{ visibility: isVisible ? 'visible' : 'hidden' }}
+    >
       {leaves.map((leaf) => (
         <div
           key={leaf.id}

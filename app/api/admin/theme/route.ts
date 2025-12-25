@@ -21,37 +21,34 @@ const defaultSettings = [
   { key: 'contact_phone', value: '+64 21 123 4567', category: 'GENERAL', label: 'Contact Phone', type: 'TEXT', description: 'Primary contact phone' },
 
   // ============================================
-  // IMAGES
+  // IMAGES - Branding & Site Identity
   // ============================================
-  { key: 'image_logo', value: '/logo.svg', category: 'IMAGES', label: 'Website Logo', type: 'IMAGE', description: 'Main logo displayed in header (recommended: SVG or PNG, 200x50px)' },
-  { key: 'image_logo_dark', value: '/logo.svg', category: 'IMAGES', label: 'Logo for Dark Background', type: 'IMAGE', description: 'Logo version for dark backgrounds' },
-  { key: 'image_favicon', value: '/favicon.ico', category: 'IMAGES', label: 'Favicon', type: 'IMAGE', description: 'Browser tab icon (32x32px or 64x64px)' },
-  { key: 'image_hero_background', value: '', category: 'IMAGES', label: 'Hero Background Image', type: 'IMAGE', description: 'Large background image for hero section (1920x1080px recommended)' },
-  { key: 'image_hero_main', value: '', category: 'IMAGES', label: 'Hero Main Image', type: 'IMAGE', description: 'Main image/photo shown in hero section (800x600px recommended)' },
-  { key: 'image_about', value: '', category: 'IMAGES', label: 'About Section Image', type: 'IMAGE', description: 'Image for about/profile section' },
-  // Portfolio Before/After pairs
-  { key: 'portfolio_1_before', value: '', category: 'IMAGES', label: 'Portfolio 1 - Before Image', type: 'IMAGE', description: 'Before image for first portfolio item (e.g., sketch, rough plan)' },
-  { key: 'portfolio_1_after', value: '', category: 'IMAGES', label: 'Portfolio 1 - After Image', type: 'IMAGE', description: 'After image for first portfolio item (e.g., 3D render)' },
-  { key: 'portfolio_1_title', value: 'Modern Kitchen Island', category: 'IMAGES', label: 'Portfolio 1 - Title', type: 'TEXT', description: 'Title for first portfolio item' },
-  { key: 'portfolio_1_description', value: 'Transformed a rough measurement sketch into photorealistic 3D render with material options.', category: 'IMAGES', label: 'Portfolio 1 - Description', type: 'TEXT', description: 'Description for first portfolio item' },
+  { key: 'image_logo', value: '/logo.svg', category: 'IMAGES', label: '1. Website Logo', type: 'IMAGE', description: 'Main logo displayed in header and footer (recommended: SVG or PNG, 200x50px)' },
+  { key: 'image_hero_main', value: '', category: 'IMAGES', label: '2. Hero Section Image', type: 'IMAGE', description: 'Main image shown on right side of hero section (800x600px recommended)' },
+  { key: 'image_og_default', value: '/og-image.png', category: 'IMAGES', label: '3. Social Share Image', type: 'IMAGE', description: 'Image shown when sharing on Facebook, Twitter, etc. (1200x630px)' },
 
-  { key: 'portfolio_2_before', value: '', category: 'IMAGES', label: 'Portfolio 2 - Before Image', type: 'IMAGE', description: 'Before image for second portfolio item' },
-  { key: 'portfolio_2_after', value: '', category: 'IMAGES', label: 'Portfolio 2 - After Image', type: 'IMAGE', description: 'After image for second portfolio item' },
-  { key: 'portfolio_2_title', value: 'Walk-in Wardrobe', category: 'IMAGES', label: 'Portfolio 2 - Title', type: 'TEXT', description: 'Title for second portfolio item' },
-  { key: 'portfolio_2_description', value: 'Client provided room dimensions. Delivered 3 design options with lighting simulation.', category: 'IMAGES', label: 'Portfolio 2 - Description', type: 'TEXT', description: 'Description for second portfolio item' },
+  // ============================================
+  // PORTFOLIO - Before/After Showcase
+  // ============================================
+  { key: 'portfolio_1_before', value: '', category: 'PORTFOLIO', label: 'Item 1: Before Image', type: 'IMAGE', description: 'Before image (sketch, rough plan, measurements)' },
+  { key: 'portfolio_1_after', value: '', category: 'PORTFOLIO', label: 'Item 1: After Image', type: 'IMAGE', description: 'After image (3D render, final design)' },
+  { key: 'portfolio_1_title', value: 'Modern Kitchen Island', category: 'PORTFOLIO', label: 'Item 1: Title', type: 'TEXT', description: 'Project title' },
+  { key: 'portfolio_1_description', value: 'Transformed a rough measurement sketch into photorealistic 3D render with material options.', category: 'PORTFOLIO', label: 'Item 1: Description', type: 'TEXTAREA', description: 'Brief project description' },
 
-  { key: 'portfolio_3_before', value: '', category: 'IMAGES', label: 'Portfolio 3 - Before Image', type: 'IMAGE', description: 'Before image for third portfolio item' },
-  { key: 'portfolio_3_after', value: '', category: 'IMAGES', label: 'Portfolio 3 - After Image', type: 'IMAGE', description: 'After image for third portfolio item' },
-  { key: 'portfolio_3_title', value: 'Entertainment Unit', category: 'IMAGES', label: 'Portfolio 3 - Title', type: 'TEXT', description: 'Title for third portfolio item' },
-  { key: 'portfolio_3_description', value: 'Pinterest inspiration turned into custom design with cable management visualization.', category: 'IMAGES', label: 'Portfolio 3 - Description', type: 'TEXT', description: 'Description for third portfolio item' },
+  { key: 'portfolio_2_before', value: '', category: 'PORTFOLIO', label: 'Item 2: Before Image', type: 'IMAGE', description: 'Before image (sketch, rough plan, measurements)' },
+  { key: 'portfolio_2_after', value: '', category: 'PORTFOLIO', label: 'Item 2: After Image', type: 'IMAGE', description: 'After image (3D render, final design)' },
+  { key: 'portfolio_2_title', value: 'Walk-in Wardrobe', category: 'PORTFOLIO', label: 'Item 2: Title', type: 'TEXT', description: 'Project title' },
+  { key: 'portfolio_2_description', value: 'Client provided room dimensions. Delivered 3 design options with lighting simulation.', category: 'PORTFOLIO', label: 'Item 2: Description', type: 'TEXTAREA', description: 'Brief project description' },
 
-  { key: 'portfolio_4_before', value: '', category: 'IMAGES', label: 'Portfolio 4 - Before Image', type: 'IMAGE', description: 'Before image for fourth portfolio item' },
-  { key: 'portfolio_4_after', value: '', category: 'IMAGES', label: 'Portfolio 4 - After Image', type: 'IMAGE', description: 'After image for fourth portfolio item' },
-  { key: 'portfolio_4_title', value: 'Bathroom Vanity', category: 'IMAGES', label: 'Portfolio 4 - Title', type: 'TEXT', description: 'Title for fourth portfolio item' },
-  { key: 'portfolio_4_description', value: 'Complex space with plumbing constraints visualized before production began.', category: 'IMAGES', label: 'Portfolio 4 - Description', type: 'TEXT', description: 'Description for fourth portfolio item' },
-  { key: 'image_cta_background', value: '', category: 'IMAGES', label: 'CTA Background Image', type: 'IMAGE', description: 'Background for call-to-action section' },
-  { key: 'image_testimonial_bg', value: '', category: 'IMAGES', label: 'Testimonials Background', type: 'IMAGE', description: 'Background for testimonials section' },
-  { key: 'image_og_default', value: '/og-image.png', category: 'IMAGES', label: 'Social Share Image (OG)', type: 'IMAGE', description: 'Default image for social media sharing (1200x630px)' },
+  { key: 'portfolio_3_before', value: '', category: 'PORTFOLIO', label: 'Item 3: Before Image', type: 'IMAGE', description: 'Before image (sketch, rough plan, measurements)' },
+  { key: 'portfolio_3_after', value: '', category: 'PORTFOLIO', label: 'Item 3: After Image', type: 'IMAGE', description: 'After image (3D render, final design)' },
+  { key: 'portfolio_3_title', value: 'Entertainment Unit', category: 'PORTFOLIO', label: 'Item 3: Title', type: 'TEXT', description: 'Project title' },
+  { key: 'portfolio_3_description', value: 'Pinterest inspiration turned into custom design with cable management visualization.', category: 'PORTFOLIO', label: 'Item 3: Description', type: 'TEXTAREA', description: 'Brief project description' },
+
+  { key: 'portfolio_4_before', value: '', category: 'PORTFOLIO', label: 'Item 4: Before Image', type: 'IMAGE', description: 'Before image (sketch, rough plan, measurements)' },
+  { key: 'portfolio_4_after', value: '', category: 'PORTFOLIO', label: 'Item 4: After Image', type: 'IMAGE', description: 'After image (3D render, final design)' },
+  { key: 'portfolio_4_title', value: 'Bathroom Vanity', category: 'PORTFOLIO', label: 'Item 4: Title', type: 'TEXT', description: 'Project title' },
+  { key: 'portfolio_4_description', value: 'Complex space with plumbing constraints visualized before production began.', category: 'PORTFOLIO', label: 'Item 4: Description', type: 'TEXTAREA', description: 'Brief project description' },
 
   // ============================================
   // COLORS
@@ -126,9 +123,9 @@ const defaultSettings = [
   { key: 'pricing_section_title', value: 'Choose Your Package', category: 'PRICING', label: 'Section Title', type: 'TEXT', description: 'Main section title' },
   { key: 'pricing_section_description', value: 'Transparent pricing with no hidden fees. Pay per project or save with a monthly retainer.', category: 'PRICING', label: 'Section Description', type: 'TEXTAREA', description: 'Paragraph under title' },
   { key: 'pricing_packages', value: JSON.stringify([
-    { name: 'Basic', subtitle: 'Perfect for simple jobs', price: '$79', period: '/project', featured: false, features: ['Single room/unit design', '2 photorealistic renders', 'Basic 2D drawing', '1 revision round', '72-hour delivery'] },
-    { name: 'Professional', subtitle: 'Best for client presentations', price: '$149', period: '/project', featured: true, features: ['Complete room design', '5 photorealistic renders', 'Detailed technical drawings', '3 revision rounds', '48-hour delivery', 'Material options included'] },
-    { name: 'Partner', subtitle: 'For regular workflow', price: '$399', period: '/month', featured: false, features: ['Up to 5 projects/month', 'Unlimited renders per project', 'Full technical package', 'Unlimited revisions', '24-hour priority delivery', 'Dedicated support line'] }
+    { name: 'Basic', subtitle: 'Perfect for simple jobs', price: '$99', period: '/project', featured: false, features: ['Single room/unit design', '2 photorealistic renders', 'Basic 2D drawing', '1 revision round', '72-hour delivery'] },
+    { name: 'Professional', subtitle: 'Best for client presentations', price: '$199', period: '/project', featured: true, features: ['Complete room design', '5 photorealistic renders', 'Detailed technical drawings', '3 revision rounds', '48-hour delivery', 'Material options included'] },
+    { name: 'Partner', subtitle: 'For regular workflow', price: '$499', period: '/month', featured: false, features: ['Up to 5 projects/month', 'Unlimited renders per project', 'Full technical package', 'Unlimited revisions', '24-hour priority delivery', 'Dedicated support line'] }
   ]), category: 'PRICING', label: 'Pricing Packages', type: 'JSON', description: 'Pricing cards configuration' },
 
   // ============================================

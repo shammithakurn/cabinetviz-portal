@@ -225,9 +225,9 @@ export const defaultThemeSettings: ThemeSettings = {
   pricing_section_title: 'Choose Your Package',
   pricing_section_description: 'Transparent pricing with no hidden fees. Pay per project or save with a monthly retainer.',
   pricing_packages: JSON.stringify([
-    { name: 'Basic', subtitle: 'Perfect for simple jobs', price: '$79', period: '/project', featured: false, features: ['Single room/unit design', '2 photorealistic renders', 'Basic 2D drawing', '1 revision round', '72-hour delivery'] },
-    { name: 'Professional', subtitle: 'Best for client presentations', price: '$149', period: '/project', featured: true, features: ['Complete room design', '5 photorealistic renders', 'Detailed technical drawings', '3 revision rounds', '48-hour delivery', 'Material options included'] },
-    { name: 'Partner', subtitle: 'For regular workflow', price: '$399', period: '/month', featured: false, features: ['Up to 5 projects/month', 'Unlimited renders per project', 'Full technical package', 'Unlimited revisions', '24-hour priority delivery', 'Dedicated support line'] }
+    { name: 'Basic', subtitle: 'Perfect for simple jobs', price: '$99', period: '/project', featured: false, features: ['Single room/unit design', '2 photorealistic renders', 'Basic 2D drawing', '1 revision round', '72-hour delivery'] },
+    { name: 'Professional', subtitle: 'Best for client presentations', price: '$199', period: '/project', featured: true, features: ['Complete room design', '5 photorealistic renders', 'Detailed technical drawings', '3 revision rounds', '48-hour delivery', 'Material options included'] },
+    { name: 'Partner', subtitle: 'For regular workflow', price: '$499', period: '/month', featured: false, features: ['Up to 5 projects/month', 'Unlimited renders per project', 'Full technical package', 'Unlimited revisions', '24-hour priority delivery', 'Dedicated support line'] }
   ]),
 
   // Process Section

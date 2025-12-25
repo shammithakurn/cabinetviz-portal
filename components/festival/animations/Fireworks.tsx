@@ -182,13 +182,11 @@ export function Fireworks({ intensity = 'medium' }: FireworksProps) {
     return () => document.removeEventListener('visibilitychange', handleVisibility)
   }, [])
 
-  if (!isVisible) return null
-
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-40"
-      style={{ background: 'transparent' }}
+      className="fixed inset-0 pointer-events-none z-[45]"
+      style={{ background: 'transparent', visibility: isVisible ? 'visible' : 'hidden' }}
     />
   )
 }

@@ -4,6 +4,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { MAX_FILE_SIZE_BYTES, MAX_FILE_SIZE_MB, formatFileSize } from '@/lib/constants'
 
 interface ThemeSetting {
   id: string
@@ -20,7 +21,8 @@ type SettingsByCategory = Record<string, ThemeSetting[]>
 
 const categoryLabels: Record<string, { label: string; icon: string; description: string }> = {
   GENERAL: { label: 'General', icon: '⚙️', description: 'Site name, logo, and contact information' },
-  IMAGES: { label: 'Images', icon: '🖼️', description: 'Upload and manage website images' },
+  IMAGES: { label: 'Images', icon: '🖼️', description: 'Logo, hero image, and social sharing image' },
+  PORTFOLIO: { label: 'Portfolio', icon: '📸', description: 'Before/After showcase images and project details' },
   COLORS: { label: 'Colors', icon: '🎨', description: 'Brand colors and color scheme' },
   TYPOGRAPHY: { label: 'Typography', icon: '🔤', description: 'Fonts and text styling' },
   HERO: { label: 'Hero Section', icon: '🦸', description: 'Main banner headline and content' },
@@ -36,7 +38,7 @@ const categoryLabels: Record<string, { label: string; icon: string; description:
   SEO: { label: 'SEO', icon: '🔍', description: 'Search engine optimization' },
 }
 
-const categoryOrder = ['GENERAL', 'IMAGES', 'COLORS', 'TYPOGRAPHY', 'HERO', 'STATS', 'PROBLEM', 'SERVICES', 'PRICING', 'PROCESS', 'TESTIMONIALS', 'FAQ', 'CTA', 'FOOTER', 'SEO']
+const categoryOrder = ['GENERAL', 'IMAGES', 'PORTFOLIO', 'COLORS', 'TYPOGRAPHY', 'HERO', 'STATS', 'PROBLEM', 'SERVICES', 'PRICING', 'PROCESS', 'TESTIMONIALS', 'FAQ', 'CTA', 'FOOTER', 'SEO']
 
 // Image Uploader Component
 function ImageUploader({
@@ -57,6 +59,15 @@ function ImageUploader({
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+
+    // Check file size before upload (see lib/constants.ts to update limit)
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      setUploadError(`File too large. Maximum size is ${MAX_FILE_SIZE_MB}MB. Your file is ${formatFileSize(file.size)}.`)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+      return
+    }
 
     setIsUploading(true)
     setUploadError(null)
@@ -141,7 +152,7 @@ function ImageUploader({
         >
           <div className="text-4xl mb-3">📷</div>
           <p className="text-text-light font-medium">Click to upload image</p>
-          <p className="text-xs text-text-muted mt-1">JPG, PNG, GIF, WebP, SVG (max 5MB)</p>
+          <p className="text-xs text-text-muted mt-1">JPG, PNG, GIF, WebP, SVG (max {MAX_FILE_SIZE_MB}MB)</p>
         </div>
       )}
 
@@ -649,19 +660,77 @@ export default function ThemeSettingsPage() {
 
                 {/* Settings Grid */}
                 <div className="space-y-6">
-                  {settings[category].map(setting => (
-                    <div key={setting.key} className="bg-dark-surface rounded-xl p-6 border border-border">
-                      <div className="mb-3">
-                        <label className="block text-sm font-semibold text-text mb-1">
-                          {setting.label}
-                        </label>
-                        {setting.description && (
-                          <p className="text-sm text-text-light">{setting.description}</p>
-                        )}
+                  {category === 'PORTFOLIO' ? (
+                    // Special layout for Portfolio - group items together with side-by-side images
+                    <>
+                      {[1, 2, 3, 4].map(itemNum => {
+                        const beforeSetting = settings[category].find(s => s.key === `portfolio_${itemNum}_before`)
+                        const afterSetting = settings[category].find(s => s.key === `portfolio_${itemNum}_after`)
+                        const titleSetting = settings[category].find(s => s.key === `portfolio_${itemNum}_title`)
+                        const descSetting = settings[category].find(s => s.key === `portfolio_${itemNum}_description`)
+
+                        if (!beforeSetting || !afterSetting || !titleSetting || !descSetting) return null
+
+                        return (
+                          <div key={itemNum} className="bg-dark-surface rounded-xl p-6 border border-border">
+                            <h3 className="text-lg font-bold text-text mb-4 flex items-center gap-2">
+                              <span className="w-8 h-8 bg-walnut/20 text-walnut rounded-full flex items-center justify-center text-sm font-bold">{itemNum}</span>
+                              Portfolio Item {itemNum}
+                            </h3>
+
+                            {/* Before/After Images Side by Side */}
+                            <div className="grid grid-cols-2 gap-4 mb-6">
+                              <div>
+                                <label className="block text-sm font-semibold text-text mb-2">
+                                  Before Image
+                                </label>
+                                <p className="text-xs text-text-muted mb-3">Sketch, rough plan, or measurements</p>
+                                {renderSettingInput(beforeSetting)}
+                              </div>
+                              <div>
+                                <label className="block text-sm font-semibold text-text mb-2">
+                                  After Image
+                                </label>
+                                <p className="text-xs text-text-muted mb-3">3D render or final design</p>
+                                {renderSettingInput(afterSetting)}
+                              </div>
+                            </div>
+
+                            {/* Title */}
+                            <div className="mb-4">
+                              <label className="block text-sm font-semibold text-text mb-1">
+                                {titleSetting.label}
+                              </label>
+                              {renderSettingInput(titleSetting)}
+                            </div>
+
+                            {/* Description */}
+                            <div>
+                              <label className="block text-sm font-semibold text-text mb-1">
+                                {descSetting.label}
+                              </label>
+                              {renderSettingInput(descSetting)}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </>
+                  ) : (
+                    // Default layout for other categories
+                    [...settings[category]].sort((a, b) => a.label.localeCompare(b.label)).map(setting => (
+                      <div key={setting.key} className="bg-dark-surface rounded-xl p-6 border border-border">
+                        <div className="mb-3">
+                          <label className="block text-sm font-semibold text-text mb-1">
+                            {setting.label}
+                          </label>
+                          {setting.description && (
+                            <p className="text-sm text-text-light">{setting.description}</p>
+                          )}
+                        </div>
+                        {renderSettingInput(setting)}
                       </div>
-                      {renderSettingInput(setting)}
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
             )

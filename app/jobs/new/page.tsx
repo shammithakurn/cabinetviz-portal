@@ -7,6 +7,7 @@ import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useDropzone } from 'react-dropzone'
+import { MAX_FILE_SIZE_BYTES, MAX_FILE_SIZE_MB, formatFileSize } from '@/lib/constants'
 
 type FormStep = 'details' | 'dimensions' | 'style' | 'files' | 'review'
 
@@ -83,13 +84,33 @@ export default function NewJobPage() {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
+  const [fileSizeError, setFileSizeError] = useState<string | null>(null)
+
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    const newFiles = acceptedFiles.map((file) => ({
-      file,
-      category: 'OTHER',
-      preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined,
-    }))
-    setUploadedFiles((prev) => [...prev, ...newFiles])
+    setFileSizeError(null)
+    const validFiles: File[] = []
+    const rejectedFiles: string[] = []
+
+    acceptedFiles.forEach((file) => {
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        rejectedFiles.push(`${file.name} (${formatFileSize(file.size)})`)
+      } else {
+        validFiles.push(file)
+      }
+    })
+
+    if (rejectedFiles.length > 0) {
+      setFileSizeError(`Files exceeding ${MAX_FILE_SIZE_MB}MB limit: ${rejectedFiles.join(', ')}. Please compress or resize these files.`)
+    }
+
+    if (validFiles.length > 0) {
+      const newFiles = validFiles.map((file) => ({
+        file,
+        category: 'OTHER',
+        preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined,
+      }))
+      setUploadedFiles((prev) => [...prev, ...newFiles])
+    }
   }, [])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -99,6 +120,7 @@ export default function NewJobPage() {
       'application/pdf': ['.pdf'],
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
     },
+    maxSize: MAX_FILE_SIZE_BYTES,
   })
 
   const removeFile = (index: number) => {
@@ -136,16 +158,32 @@ export default function NewJobPage() {
 
       // Upload files if any
       if (uploadedFiles.length > 0) {
+        const uploadErrors: string[] = []
+
         for (const uploadedFile of uploadedFiles) {
           const formData = new FormData()
           formData.append('file', uploadedFile.file)
           formData.append('jobId', job.id)
           formData.append('category', uploadedFile.category)
 
-          await fetch('/api/upload', {
-            method: 'POST',
-            body: formData,
-          })
+          try {
+            const uploadRes = await fetch('/api/upload', {
+              method: 'POST',
+              body: formData,
+            })
+
+            if (!uploadRes.ok) {
+              const errorData = await uploadRes.json()
+              uploadErrors.push(`${uploadedFile.file.name}: ${errorData.error || 'Upload failed'}`)
+            }
+          } catch {
+            uploadErrors.push(`${uploadedFile.file.name}: Network error`)
+          }
+        }
+
+        if (uploadErrors.length > 0) {
+          console.error('File upload errors:', uploadErrors)
+          alert(`Job created but some files failed to upload:\n${uploadErrors.join('\n')}`)
         }
       }
 
@@ -522,6 +560,12 @@ export default function NewJobPage() {
                 </p>
               </div>
 
+              {fileSizeError && (
+                <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-red-400">
+                  <p className="font-medium">⚠️ {fileSizeError}</p>
+                </div>
+              )}
+
               <div
                 {...getRootProps()}
                 className={`border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-colors ${
@@ -539,6 +583,9 @@ export default function NewJobPage() {
                 </p>
                 <p className="text-sm text-text-muted">
                   Supports: Images (PNG, JPG), PDFs, Documents
+                </p>
+                <p className="text-xs text-text-muted mt-2">
+                  Maximum file size: {MAX_FILE_SIZE_MB}MB per file
                 </p>
               </div>
 

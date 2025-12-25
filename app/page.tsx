@@ -9,6 +9,9 @@ import Link from 'next/link'
 import BeforeAfterSlider from '@/components/BeforeAfterSlider'
 import { getThemeSettings, parseJsonSetting } from '@/lib/theme'
 import { FestivalWrapper } from '@/components/festival'
+import ScrollToTop from '@/components/ScrollToTop'
+import DiscountBanner from '@/components/DiscountBanner'
+import { prisma } from '@/lib/db'
 
 async function signOut() {
   'use server'
@@ -19,6 +22,27 @@ async function signOut() {
 export default async function HomePage() {
   const session = await getSession()
   const theme = await getThemeSettings()
+
+  // Fetch active site-wide discount
+  const now = new Date()
+  const activeDiscount = await prisma.siteDiscount.findFirst({
+    where: {
+      isActive: true,
+      startDate: { lte: now },
+      endDate: { gte: now },
+    },
+    select: {
+      id: true,
+      name: true,
+      type: true,
+      value: true,
+      bannerText: true,
+      bannerColor: true,
+      appliesTo: true,
+      startDate: true,
+      endDate: true,
+    },
+  })
 
   // Parse JSON settings
   const problemCards = parseJsonSetting<Array<{ icon: string; title: string; description: string }>>(
@@ -40,10 +64,26 @@ export default async function HomePage() {
     theme.faq_items, []
   )
 
+  // Serialize discount for client component
+  const discountData = activeDiscount ? {
+    id: activeDiscount.id,
+    name: activeDiscount.name,
+    type: activeDiscount.type,
+    value: activeDiscount.value,
+    bannerText: activeDiscount.bannerText,
+    bannerColor: activeDiscount.bannerColor,
+    appliesTo: activeDiscount.appliesTo,
+    startDate: activeDiscount.startDate.toISOString(),
+    endDate: activeDiscount.endDate.toISOString(),
+  } : null
+
   return (
     <div className="min-h-screen bg-warm-white overflow-x-hidden">
       {/* Festival Overlay - Automatic festive decorations */}
       <FestivalWrapper />
+
+      {/* Floating Discount Badge - positions in bottom-right corner */}
+      {discountData && <DiscountBanner discount={discountData} />}
 
       {/* Grain Overlay - z-30 to stay below animations (z-40) and banners */}
       <div className="fixed inset-0 pointer-events-none z-30 opacity-[0.03]"
@@ -52,7 +92,7 @@ export default async function HomePage() {
         }}
       />
 
-      {/* Navigation - offset by festival banner height when present */}
+      {/* Navigation - offset by festival banner height only */}
       <nav
         className="fixed left-0 right-0 px-[4%] py-5 flex justify-between items-center bg-warm-white/95 backdrop-blur-xl z-40 border-b border-border transition-all duration-300"
         style={{ top: 'var(--festival-banner-height, 0px)' }}
@@ -408,6 +448,9 @@ export default async function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* Scroll to Top Button */}
+      <ScrollToTop />
     </div>
   )
 }

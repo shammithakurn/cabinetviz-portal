@@ -47,10 +47,11 @@ export function Hearts({ intensity = 'medium' }: HeartsProps) {
     return () => document.removeEventListener('visibilitychange', handleVisibility)
   }, [])
 
-  if (!isVisible) return null
-
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden z-40">
+    <div
+      className="fixed inset-0 pointer-events-none overflow-hidden z-[45]"
+      style={{ visibility: isVisible ? 'visible' : 'hidden' }}
+    >
       {hearts.map((heart) => (
         <div
           key={heart.id}

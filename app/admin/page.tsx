@@ -294,6 +294,55 @@ export default async function AdminDashboardPage() {
         />
       </div>
 
+      {/* Billing & Subscriptions */}
+      <div className="mb-8">
+        <h2 className="text-lg font-bold text-text mb-4">Billing & Subscriptions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Link
+            href="/admin/subscriptions"
+            className="bg-dark-surface rounded-xl border border-border p-5 hover:shadow-md transition-all hover:border-walnut/50"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-blue-900/30 rounded-xl flex items-center justify-center text-2xl">
+                📦
+              </div>
+              <div>
+                <h3 className="font-bold text-text">Subscriptions</h3>
+                <p className="text-sm text-text-light">Manage partner plans</p>
+              </div>
+            </div>
+          </Link>
+          <Link
+            href="/admin/payments"
+            className="bg-dark-surface rounded-xl border border-border p-5 hover:shadow-md transition-all hover:border-walnut/50"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-green-900/30 rounded-xl flex items-center justify-center text-2xl">
+                💳
+              </div>
+              <div>
+                <h3 className="font-bold text-text">Payments</h3>
+                <p className="text-sm text-text-light">Invoices & transactions</p>
+              </div>
+            </div>
+          </Link>
+          <Link
+            href="/admin/discounts"
+            className="bg-dark-surface rounded-xl border border-border p-5 hover:shadow-md transition-all hover:border-walnut/50"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-purple-900/30 rounded-xl flex items-center justify-center text-2xl">
+                🏷️
+              </div>
+              <div>
+                <h3 className="font-bold text-text">Discounts</h3>
+                <p className="text-sm text-text-light">Promo codes & sales</p>
+              </div>
+            </div>
+          </Link>
+        </div>
+      </div>
+
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Recent Jobs Table */}

@@ -182,7 +182,7 @@ export function Easter({ intensity = 'medium' }: EasterProps) {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-40"
+      className="fixed inset-0 pointer-events-none z-[45]"
       style={{ background: 'transparent' }}
     />
   )

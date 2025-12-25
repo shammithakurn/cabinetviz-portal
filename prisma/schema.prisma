@@ -29,9 +29,169 @@ model User {
   // Relationships
   jobs                Job[]
   notifications       Notification[]
+  subscription        Subscription?
+  payments            Payment[]
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+}
+
+// ============================================
+// SUBSCRIPTIONS & PAYMENTS
+// ============================================
+
+// Pricing Plans Configuration
+// BASIC: $99/project - Single project, 2 renders, 1 revision
+// PROFESSIONAL: $199/project - Full project, 5 renders, 3 revisions
+// PARTNER: $499/month - Up to 5 projects/month, unlimited renders & revisions
+
+model Subscription {
+  id              String    @id @default(cuid())
+
+  // Plan Details
+  plan            String    // PARTNER (only subscription plan)
+  status          String    @default("ACTIVE") // ACTIVE, PAUSED, CANCELLED, EXPIRED, PENDING
+
+  // Billing Cycle
+  billingCycle    String    @default("MONTHLY") // MONTHLY, YEARLY
+  pricePerCycle   Float     @default(499) // $499/month for Partner
+
+  // Dates
+  startDate       DateTime  @default(now())
+  currentPeriodStart DateTime @default(now())
+  currentPeriodEnd   DateTime
+  cancelledAt     DateTime?
+
+  // Usage Tracking (for Partner plan: 5 projects/month)
+  projectsUsedThisMonth Int @default(0)
+  projectsLimit   Int       @default(5) // Partner gets 5/month
+  lastResetDate   DateTime  @default(now()) // When usage was last reset
+
+  // Payment Integration (future-ready)
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  paymentMethod        String? // CARD, BANK_TRANSFER, INVOICE
+
+  // Admin Notes
+  notes           String?
+
+  // Relationships
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Payment {
+  id              String    @id @default(cuid())
+
+  // Payment Details
+  amount          Float
+  originalAmount  Float?    // Amount before discount
+  discountAmount  Float?    // Discount applied
+  discountCode    String?   // Discount code used
+  currency        String    @default("NZD")
+  status          String    @default("PENDING") // PENDING, PAID, FAILED, REFUNDED, CANCELLED
+
+  // Payment Type
+  type            String    // SUBSCRIPTION, PROJECT, ONE_TIME
+  description     String
+
+  // Reference (what this payment is for)
+  jobId           String?   // For project payments
+  subscriptionMonth String? // For subscription: "2025-01" format
+
+  // Invoice Details
+  invoiceNumber   String?   @unique
+  invoiceUrl      String?   // URL to PDF invoice
+  invoiceSentAt   DateTime?
+
+  // Payment Processing (future-ready for Stripe)
+  stripePaymentIntentId String?
+  stripeInvoiceId       String?
+  paymentMethod         String? // CARD, BANK_TRANSFER, CASH, OTHER
+  paidAt                DateTime?
+
+  // Admin
+  notes           String?
+  processedBy     String?   // Admin who marked as paid
+
+  // Relationships
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+// ============================================
+// DISCOUNTS & PROMOTIONS
+// ============================================
+
+model Discount {
+  id              String    @id @default(cuid())
+
+  // Discount Details
+  code            String    @unique // Promo code (e.g., "SUMMER20", "WELCOME10")
+  name            String    // Display name
+  description     String?
+
+  // Discount Type
+  type            String    // PERCENTAGE, FIXED_AMOUNT
+  value           Float     // 20 for 20% or 50 for $50 off
+
+  // Scope
+  scope           String    @default("ALL") // ALL (site-wide), SUBSCRIPTION, PROJECT, USER_SPECIFIC
+  applicablePlans String?   // Comma-separated: "BASIC,PROFESSIONAL" or null for all
+
+  // User-specific discount (for customer-centric discounts)
+  userId          String?   // If set, only this user can use it
+
+  // Limits
+  maxUses         Int?      // Total uses allowed (null = unlimited)
+  maxUsesPerUser  Int       @default(1) // Uses per user
+  usedCount       Int       @default(0) // Current total uses
+  minOrderValue   Float?    // Minimum order value to apply
+
+  // Validity
+  isActive        Boolean   @default(true)
+  startDate       DateTime  @default(now())
+  endDate         DateTime?
+
+  // Tracking
+  createdBy       String?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+// Site-wide discount settings (global discount that applies to everyone)
+model SiteDiscount {
+  id              String    @id @default(cuid())
+
+  // Only one active site discount at a time
+  isActive        Boolean   @default(false)
+
+  // Discount Details
+  name            String    // e.g., "Christmas Sale", "New Year Special"
+  type            String    // PERCENTAGE, FIXED_AMOUNT
+  value           Float     // Discount value
+
+  // Display
+  bannerText      String?   // Text to show on website
+  bannerColor     String?   // Banner background color
+
+  // Scope
+  appliesTo       String    @default("ALL") // ALL, SUBSCRIPTION, PROJECT
+
+  // Validity
+  startDate       DateTime
+  endDate         DateTime
+
+  createdBy       String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }
 
 // ============================================
@@ -70,6 +230,9 @@ model Job {
   // Package/Pricing
   package       String      @default("PROFESSIONAL") // BASIC, PROFESSIONAL, PARTNER
   quotedPrice   Float?
+  isPaid        Boolean     @default(false)
+  paidAt        DateTime?
+  paymentId     String?     // Reference to Payment record
 
   // Progress Tracking
   progress      Int         @default(0) // 0-100

@@ -50,6 +50,18 @@ export default async function DashboardPage() {
   const completed = stats.find((s: StatusCount) => s.status === 'COMPLETED')?._count || 0
   const pendingReview = stats.find((s: StatusCount) => s.status === 'REVIEW')?._count || 0
 
+  // Fetch subscription info
+  const subscription = await prisma.subscription.findUnique({
+    where: { userId: user.id }
+  })
+
+  // Fetch pending payments
+  const pendingPayments = await prisma.payment.findMany({
+    where: { userId: user.id, status: 'PENDING' },
+    orderBy: { createdAt: 'desc' },
+    take: 3
+  })
+
   return (
     <div className="p-8 bg-warm-white min-h-screen">
       {/* Header */}
@@ -61,6 +73,97 @@ export default async function DashboardPage() {
           Here's an overview of your cabinet visualization projects
         </p>
       </div>
+
+      {/* Subscription & Account Status */}
+      {subscription ? (
+        <div className="bg-gradient-to-r from-blue-900/40 to-purple-900/40 rounded-2xl border border-blue-700/30 p-6 mb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 bg-blue-500/20 rounded-xl flex items-center justify-center text-3xl">
+                📦
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-text">Partner Plan</h2>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                    subscription.status === 'ACTIVE' ? 'bg-green-500/20 text-green-400' :
+                    subscription.status === 'PAUSED' ? 'bg-yellow-500/20 text-yellow-400' :
+                    'bg-red-500/20 text-red-400'
+                  }`}>
+                    {subscription.status}
+                  </span>
+                </div>
+                <p className="text-text-light text-sm">
+                  ${subscription.pricePerCycle}/month • Renews {new Date(subscription.currentPeriodEnd).toLocaleDateString('en-NZ', { day: 'numeric', month: 'short' })}
+                </p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-32 h-2 bg-dark-elevated rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-blue-500 rounded-full"
+                    style={{ width: `${(subscription.projectsUsedThisMonth / subscription.projectsLimit) * 100}%` }}
+                  />
+                </div>
+                <span className="text-sm font-medium text-text">
+                  {subscription.projectsUsedThisMonth}/{subscription.projectsLimit}
+                </span>
+              </div>
+              <p className="text-xs text-text-light">Projects this month</p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-gradient-to-r from-amber-900/30 to-orange-900/30 rounded-2xl border border-amber-700/30 p-6 mb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 bg-amber-500/20 rounded-xl flex items-center justify-center text-3xl">
+                💼
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-text">Pay-Per-Project</h2>
+                <p className="text-text-light text-sm">
+                  You're on pay-per-project pricing. Consider Partner plan for savings!
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/dashboard/billing"
+              className="px-4 py-2 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition-colors text-sm"
+            >
+              View Plans
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Pending Payments Alert */}
+      {pendingPayments.length > 0 && (
+        <div className="bg-red-900/20 border border-red-700/30 rounded-xl p-4 mb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center text-xl">
+                💳
+              </div>
+              <div>
+                <p className="font-medium text-red-400">
+                  {pendingPayments.length} Pending Payment{pendingPayments.length > 1 ? 's' : ''}
+                </p>
+                <p className="text-sm text-text-light">
+                  Total: ${pendingPayments.reduce((sum, p) => sum + p.amount, 0).toLocaleString('en-NZ', { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/dashboard/billing"
+              className="px-4 py-2 bg-red-500/20 text-red-400 rounded-lg font-medium hover:bg-red-500/30 transition-colors text-sm"
+            >
+              View Invoices
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

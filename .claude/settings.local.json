@@ -37,7 +37,9 @@
       "Bash(do echo \"Attempt $i...\")",
       "Bash(break)",
       "Bash(done)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(vercel inspect:*)",
+      "Bash(xargs:*)"
     ],
     "deny": [],
     "ask": []

@@ -75,6 +75,24 @@ export async function POST(request: NextRequest) {
 
     const data = validationResult.data
 
+    // Check subscription if user has one
+    const subscription = await prisma.subscription.findUnique({
+      where: { userId: user.id }
+    })
+
+    let usesSubscription = false
+
+    if (subscription && subscription.status === 'ACTIVE') {
+      // Check if user has remaining projects in their subscription
+      if (subscription.projectsUsedThisMonth >= subscription.projectsLimit) {
+        // Subscription limit reached, will charge per-project
+        usesSubscription = false
+      } else {
+        // Use subscription project
+        usesSubscription = true
+      }
+    }
+
     // Generate unique job number
     let jobNumber = generateJobNumber()
     let attempts = 0
@@ -85,6 +103,15 @@ export async function POST(request: NextRequest) {
       attempts++
     }
 
+    // Determine package type and pricing
+    const packagePricing: Record<string, number> = {
+      'BASIC': 99,
+      'PROFESSIONAL': 199,
+      'PREMIUM': 299,
+    }
+    const packageType = data.package || 'BASIC'
+    const basePrice = usesSubscription ? 0 : (packagePricing[packageType] || 99)
+
     // Create the job
     const job = await prisma.job.create({
       data: {
@@ -94,7 +121,7 @@ export async function POST(request: NextRequest) {
         projectType: data.projectType,
         roomType: data.roomType || null,
         priority: data.priority,
-        package: data.package,
+        package: packageType,
         roomWidth: data.roomWidth || null,
         roomLength: data.roomLength || null,
         roomHeight: data.roomHeight || null,
@@ -107,20 +134,40 @@ export async function POST(request: NextRequest) {
         deadline: data.deadline ? new Date(data.deadline) : null,
         notes: data.notes || null,
         userId: user.id,
+        // Set quoted price based on subscription or pay-per-project
+        quotedPrice: basePrice > 0 ? basePrice : null,
         statusHistory: {
           create: {
             toStatus: 'PENDING',
             changedBy: user.name,
-            note: 'Job created',
+            note: usesSubscription
+              ? 'Job created (Partner subscription)'
+              : 'Job created (Pay-per-project)',
           },
         },
       },
     })
 
+    // If using subscription, increment the usage counter
+    if (usesSubscription && subscription) {
+      await prisma.subscription.update({
+        where: { id: subscription.id },
+        data: {
+          projectsUsedThisMonth: subscription.projectsUsedThisMonth + 1
+        }
+      })
+    }
+
     // Create notification for admin (in production, you'd notify admin users)
     // For now, we'll skip this
 
-    return NextResponse.json({ job }, { status: 201 })
+    return NextResponse.json({
+      job,
+      usesSubscription,
+      message: usesSubscription
+        ? `Project created using your Partner subscription (${subscription!.projectsUsedThisMonth + 1}/${subscription!.projectsLimit} used this month)`
+        : 'Project created with pay-per-project pricing'
+    }, { status: 201 })
   } catch (error) {
     console.error('Failed to create job:', error)
     return NextResponse.json(

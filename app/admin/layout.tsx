@@ -101,6 +101,17 @@ export default async function AdminLayout({
 
           <div className="px-4 mb-6">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+              Billing
+            </p>
+            <div className="space-y-1">
+              <NavItem href="/admin/subscriptions" icon="📦" label="Subscriptions" />
+              <NavItem href="/admin/payments" icon="💳" label="Payments" />
+              <NavItem href="/admin/discounts" icon="🏷️" label="Discounts" />
+            </div>
+          </div>
+
+          <div className="px-4 mb-6">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
               Tools
             </p>
             <div className="space-y-1">

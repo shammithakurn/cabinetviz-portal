@@ -67,10 +67,10 @@ export default function BeforeAfterSlider({
   }, [])
 
   return (
-    <div className="rounded-3xl overflow-hidden shadow-medium transition-transform duration-300 hover:scale-[1.02]">
+    <div className="h-full flex flex-col rounded-3xl overflow-hidden shadow-medium transition-transform duration-300 hover:scale-[1.02]">
       <div
         ref={containerRef}
-        className="relative aspect-[4/3] overflow-hidden cursor-ew-resize select-none"
+        className="relative aspect-[4/3] overflow-hidden cursor-ew-resize select-none flex-shrink-0"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -118,9 +118,12 @@ export default function BeforeAfterSlider({
           className="absolute top-0 bottom-0 w-1 bg-white z-10"
           style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
         >
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center cursor-ew-resize hover:scale-110 transition-transform">
-            <svg className="w-6 h-6 text-walnut" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center gap-1 cursor-ew-resize hover:scale-110 transition-transform">
+            <svg className="w-4 h-4 text-walnut" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+            </svg>
+            <svg className="w-4 h-4 text-walnut" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
             </svg>
           </div>
         </div>
@@ -144,9 +147,9 @@ export default function BeforeAfterSlider({
       </div>
 
       {/* Description */}
-      <div className="bg-white p-6">
+      <div className="bg-white p-6 flex-1 flex flex-col">
         <h4 className="text-lg font-display font-semibold text-charcoal mb-2">{title}</h4>
-        <p className="text-text-light text-sm">{description}</p>
+        <p className="text-text-light text-sm flex-1">{description}</p>
       </div>
     </div>
   )

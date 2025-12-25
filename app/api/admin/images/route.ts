@@ -6,6 +6,7 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { put, del, list } from '@vercel/blob'
 import { getCurrentUser } from '@/lib/auth'
+import { MAX_FILE_SIZE_BYTES, MAX_FILE_SIZE_MB, formatFileSize } from '@/lib/constants'
 
 // GET - List all uploaded theme images
 export async function GET() {
@@ -54,9 +55,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid file type. Allowed: JPG, PNG, GIF, WebP, SVG' }, { status: 400 })
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      return NextResponse.json({ error: 'File too large. Maximum size is 5MB' }, { status: 400 })
+    // Validate file size (Vercel serverless limit - see lib/constants.ts to update)
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      return NextResponse.json({
+        error: `File too large. Maximum size is ${MAX_FILE_SIZE_MB}MB. Your file is ${formatFileSize(file.size)}.`
+      }, { status: 400 })
     }
 
     // Generate unique filename
