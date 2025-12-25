@@ -19,13 +19,27 @@ export interface ThemeSettings {
   image_hero_background: string
   image_hero_main: string
   image_about: string
-  image_portfolio_1: string
-  image_portfolio_2: string
-  image_portfolio_3: string
-  image_portfolio_4: string
   image_cta_background: string
   image_testimonial_bg: string
   image_og_default: string
+
+  // Portfolio Before/After
+  portfolio_1_before: string
+  portfolio_1_after: string
+  portfolio_1_title: string
+  portfolio_1_description: string
+  portfolio_2_before: string
+  portfolio_2_after: string
+  portfolio_2_title: string
+  portfolio_2_description: string
+  portfolio_3_before: string
+  portfolio_3_after: string
+  portfolio_3_title: string
+  portfolio_3_description: string
+  portfolio_4_before: string
+  portfolio_4_after: string
+  portfolio_4_title: string
+  portfolio_4_description: string
 
   // Colors
   color_primary: string
@@ -130,13 +144,27 @@ export const defaultThemeSettings: ThemeSettings = {
   image_hero_background: '',
   image_hero_main: '',
   image_about: '',
-  image_portfolio_1: '',
-  image_portfolio_2: '',
-  image_portfolio_3: '',
-  image_portfolio_4: '',
   image_cta_background: '',
   image_testimonial_bg: '',
   image_og_default: '/og-image.png',
+
+  // Portfolio Before/After
+  portfolio_1_before: '',
+  portfolio_1_after: '',
+  portfolio_1_title: 'Modern Kitchen Island',
+  portfolio_1_description: 'Transformed a rough measurement sketch into photorealistic 3D render with material options.',
+  portfolio_2_before: '',
+  portfolio_2_after: '',
+  portfolio_2_title: 'Walk-in Wardrobe',
+  portfolio_2_description: 'Client provided room dimensions. Delivered 3 design options with lighting simulation.',
+  portfolio_3_before: '',
+  portfolio_3_after: '',
+  portfolio_3_title: 'Entertainment Unit',
+  portfolio_3_description: 'Pinterest inspiration turned into custom design with cable management visualization.',
+  portfolio_4_before: '',
+  portfolio_4_after: '',
+  portfolio_4_title: 'Bathroom Vanity',
+  portfolio_4_description: 'Complex space with plumbing constraints visualized before production began.',
 
   // Colors
   color_primary: '#5D4E37',

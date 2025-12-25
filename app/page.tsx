@@ -198,10 +198,42 @@ export default async function HomePage() {
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-          <BeforeAfterSlider beforeIcon="📝" beforeLabel="Your Sketch" afterIcon="🍳" title="Modern Kitchen Island" description="Transformed a rough measurement sketch into photorealistic 3D render with material options." />
-          <BeforeAfterSlider beforeIcon="📏" beforeLabel="Basic Dimensions" afterIcon="👔" title="Walk-in Wardrobe" description="Client provided room dimensions. Delivered 3 design options with lighting simulation." />
-          <BeforeAfterSlider beforeIcon="✏️" beforeLabel="Rough Idea" afterIcon="📺" title="Entertainment Unit" description="Pinterest inspiration turned into custom design with cable management visualization." />
-          <BeforeAfterSlider beforeIcon="📐" beforeLabel="Floor Plan" afterIcon="🚿" title="Bathroom Vanity" description="Complex space with plumbing constraints visualized before production began." />
+          <BeforeAfterSlider
+            beforeImage={theme.portfolio_1_before}
+            afterImage={theme.portfolio_1_after}
+            beforeIcon="📝"
+            beforeLabel="Your Sketch"
+            afterIcon="🍳"
+            title={theme.portfolio_1_title}
+            description={theme.portfolio_1_description}
+          />
+          <BeforeAfterSlider
+            beforeImage={theme.portfolio_2_before}
+            afterImage={theme.portfolio_2_after}
+            beforeIcon="📏"
+            beforeLabel="Basic Dimensions"
+            afterIcon="👔"
+            title={theme.portfolio_2_title}
+            description={theme.portfolio_2_description}
+          />
+          <BeforeAfterSlider
+            beforeImage={theme.portfolio_3_before}
+            afterImage={theme.portfolio_3_after}
+            beforeIcon="✏️"
+            beforeLabel="Rough Idea"
+            afterIcon="📺"
+            title={theme.portfolio_3_title}
+            description={theme.portfolio_3_description}
+          />
+          <BeforeAfterSlider
+            beforeImage={theme.portfolio_4_before}
+            afterImage={theme.portfolio_4_after}
+            beforeIcon="📐"
+            beforeLabel="Floor Plan"
+            afterIcon="🚿"
+            title={theme.portfolio_4_title}
+            description={theme.portfolio_4_description}
+          />
         </div>
       </section>
 

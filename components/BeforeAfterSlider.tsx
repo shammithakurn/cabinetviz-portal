@@ -3,17 +3,21 @@
 import { useState, useRef, useCallback } from 'react'
 
 interface BeforeAfterSliderProps {
-  beforeIcon: string
-  beforeLabel: string
-  afterIcon: string
+  beforeImage?: string
+  beforeIcon?: string
+  beforeLabel?: string
+  afterImage?: string
+  afterIcon?: string
   title: string
   description: string
 }
 
 export default function BeforeAfterSlider({
-  beforeIcon,
-  beforeLabel,
-  afterIcon,
+  beforeImage,
+  beforeIcon = '📝',
+  beforeLabel = 'Before',
+  afterImage,
+  afterIcon = '✨',
   title,
   description,
 }: BeforeAfterSliderProps) {
@@ -76,17 +80,37 @@ export default function BeforeAfterSlider({
         onTouchEnd={handleTouchEnd}
       >
         {/* Before Side */}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 flex flex-col items-center justify-center gap-4">
-          <div className="text-7xl opacity-50">{beforeIcon}</div>
-          <p className="text-gray-500 font-medium">{beforeLabel}</p>
+        <div className="absolute inset-0">
+          {beforeImage ? (
+            <img
+              src={beforeImage}
+              alt="Before"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex flex-col items-center justify-center gap-4">
+              <div className="text-7xl opacity-50">{beforeIcon}</div>
+              <p className="text-gray-500 font-medium">{beforeLabel}</p>
+            </div>
+          )}
         </div>
 
         {/* After Side */}
         <div
-          className="absolute inset-0 bg-gradient-to-br from-amber-100 via-orange-50 to-yellow-100 flex items-center justify-center"
+          className="absolute inset-0"
           style={{ clipPath: `inset(0 0 0 ${sliderPosition}%)` }}
         >
-          <div className="text-7xl">{afterIcon}</div>
+          {afterImage ? (
+            <img
+              src={afterImage}
+              alt="After"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-amber-100 via-orange-50 to-yellow-100 flex items-center justify-center">
+              <div className="text-7xl">{afterIcon}</div>
+            </div>
+          )}
         </div>
 
         {/* Slider Handle */}
