@@ -144,11 +144,6 @@ export default async function UploadDeliverablesPage({ params }: Props) {
                           type="submit"
                           className="p-2 text-red-400 hover:bg-red-900/30 rounded-lg transition-colors"
                           title="Delete"
-                          onClick={(e) => {
-                            if (!confirm('Are you sure you want to delete this deliverable?')) {
-                              e.preventDefault()
-                            }
-                          }}
                         >
                           🗑️
                         </button>
