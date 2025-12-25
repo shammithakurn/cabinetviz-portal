@@ -63,7 +63,7 @@ export default async function DownloadsPage() {
               No downloads yet
             </h3>
             <p className="text-text-light mb-6">
-              Your renders, drawings, and documents will appear here once they're ready
+              {"Your renders, drawings, and documents will appear here once they're ready"}
             </p>
             <Link
               href="/dashboard"

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 
 interface Subscription {
@@ -43,11 +43,7 @@ export default function AdminSubscriptionsPage() {
   const [showModal, setShowModal] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
 
-  useEffect(() => {
-    fetchSubscriptions()
-  }, [statusFilter])
-
-  const fetchSubscriptions = async () => {
+  const fetchSubscriptions = useCallback(async () => {
     try {
       const params = new URLSearchParams()
       if (statusFilter !== 'all') params.append('status', statusFilter)
@@ -64,7 +60,11 @@ export default function AdminSubscriptionsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [statusFilter])
+
+  useEffect(() => {
+    fetchSubscriptions()
+  }, [fetchSubscriptions])
 
   const handleAction = async (id: string, action: string) => {
     setActionLoading(true)

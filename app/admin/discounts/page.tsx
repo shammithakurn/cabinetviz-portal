@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 
 interface Discount {
@@ -74,11 +74,7 @@ export default function AdminDiscountsPage() {
     isActive: true
   })
 
-  useEffect(() => {
-    fetchDiscounts()
-  }, [activeTab])
-
-  const fetchDiscounts = async () => {
+  const fetchDiscounts = useCallback(async () => {
     setLoading(true)
     try {
       const res = await fetch(`/api/admin/discounts?type=${activeTab}`)
@@ -96,7 +92,11 @@ export default function AdminDiscountsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [activeTab])
+
+  useEffect(() => {
+    fetchDiscounts()
+  }, [fetchDiscounts])
 
   const handleCreate = async () => {
     // Validate required fields

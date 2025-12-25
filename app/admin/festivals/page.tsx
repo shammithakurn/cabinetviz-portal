@@ -3,7 +3,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 interface Festival {
   id: string
@@ -194,13 +194,7 @@ export default function FestivalManagementPage() {
   })
 
   // Load all data
-  useEffect(() => {
-    loadFestivals()
-    loadCustomFestivals()
-    loadAnimationElements()
-  }, [selectedYear, selectedCountry])
-
-  async function loadFestivals() {
+  const loadFestivals = useCallback(async () => {
     try {
       setIsLoading(true)
       const res = await fetch(`/api/admin/festivals?year=${selectedYear}&country=${selectedCountry}`)
@@ -213,7 +207,13 @@ export default function FestivalManagementPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [selectedYear, selectedCountry])
+
+  useEffect(() => {
+    loadFestivals()
+    loadCustomFestivals()
+    loadAnimationElements()
+  }, [loadFestivals])
 
   async function loadCustomFestivals() {
     try {

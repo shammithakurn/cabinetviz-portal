@@ -789,7 +789,7 @@ export default function ThemeSettingsPage() {
           <span className="text-amber-400 text-2xl">⚠️</span>
           <div>
             <p className="font-medium text-amber-300">You have unsaved changes</p>
-            <p className="text-sm text-amber-400/80">Don't forget to save before leaving</p>
+            <p className="text-sm text-amber-400/80">{"Don't forget to save before leaving"}</p>
           </div>
           <button
             onClick={saveSettings}

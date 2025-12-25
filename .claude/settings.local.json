@@ -39,7 +39,17 @@
       "Bash(done)",
       "Bash(cd:*)",
       "Bash(vercel inspect:*)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Bash(wc:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx next lint:*)",
+      "Bash(npx prisma validate:*)",
+      "Bash(npx depcheck)",
+      "Bash(npm audit:*)",
+      "Bash(if exist eslint.config.mjs del /f eslint.config.mjs)",
+      "Bash(npm ls:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npm uninstall:*)"
     ],
     "deny": [],
     "ask": []

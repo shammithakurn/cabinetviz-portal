@@ -51,10 +51,10 @@ export default function ForgotPasswordPage() {
               </div>
               <h1 className="text-2xl font-bold text-text mb-2">Check your email</h1>
               <p className="text-text-light mb-8">
-                We've sent password reset instructions to <span className="font-medium text-text">{email}</span>
+                {"We've sent password reset instructions to "}<span className="font-medium text-text">{email}</span>
               </p>
               <p className="text-sm text-text-muted mb-6">
-                Didn't receive the email? Check your spam folder or try again.
+                {"Didn't receive the email? Check your spam folder or try again."}
               </p>
               <div className="space-y-3">
                 <button
@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
             <>
               <h1 className="text-2xl font-bold text-text mb-2">Forgot your password?</h1>
               <p className="text-text-light mb-8">
-                No worries! Enter your email and we'll send you reset instructions.
+                {"No worries! Enter your email and we'll send you reset instructions."}
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-5">
@@ -147,8 +147,7 @@ export default function ForgotPasswordPage() {
             Password Recovery
           </h2>
           <p className="text-text-light">
-            Don't worry, it happens to the best of us. We'll help you get back
-            into your account in no time.
+            {"Don't worry, it happens to the best of us. We'll help you get back into your account in no time."}
           </p>
         </div>
       </div>

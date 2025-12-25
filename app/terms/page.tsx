@@ -33,7 +33,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-xl font-bold text-text mb-4">1. Acceptance of Terms</h2>
             <p className="text-text-light">
-              By accessing and using CabinetViz ("the Service"), you accept and agree to be bound by
+              By accessing and using CabinetViz (&quot;the Service&quot;), you accept and agree to be bound by
               the terms and provision of this agreement. If you do not agree to abide by these terms,
               please do not use this service.
             </p>
@@ -98,7 +98,7 @@ export default function TermsPage() {
               CabinetViz provides visualization services only. We are not responsible for
               manufacturing errors, measurement inaccuracies provided by the client, or any
               issues arising from the actual construction of cabinets based on our designs.
-              It is the client's responsibility to verify all measurements and specifications.
+              {"It is the client's responsibility to verify all measurements and specifications."}
             </p>
           </section>
 

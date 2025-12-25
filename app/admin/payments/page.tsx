@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 
 interface Payment {
@@ -47,11 +47,7 @@ export default function AdminPaymentsPage() {
   const [showModal, setShowModal] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
 
-  useEffect(() => {
-    fetchPayments()
-  }, [statusFilter, typeFilter])
-
-  const fetchPayments = async () => {
+  const fetchPayments = useCallback(async () => {
     try {
       const params = new URLSearchParams()
       if (statusFilter !== 'all') params.append('status', statusFilter)
@@ -69,7 +65,11 @@ export default function AdminPaymentsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [statusFilter, typeFilter])
+
+  useEffect(() => {
+    fetchPayments()
+  }, [fetchPayments])
 
   const handleAction = async (id: string, action: string, extraData?: Record<string, string>) => {
     setActionLoading(true)

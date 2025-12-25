@@ -70,7 +70,7 @@ export default async function DashboardPage() {
           Welcome back, {user.name.split(' ')[0]}! 👋
         </h1>
         <p className="text-text-light mt-1">
-          Here's an overview of your cabinet visualization projects
+          {"Here's an overview of your cabinet visualization projects"}
         </p>
       </div>
 
@@ -124,7 +124,7 @@ export default async function DashboardPage() {
               <div>
                 <h2 className="text-lg font-bold text-text">Pay-Per-Project</h2>
                 <p className="text-text-light text-sm">
-                  You're on pay-per-project pricing. Consider Partner plan for savings!
+                  {"You're on pay-per-project pricing. Consider Partner plan for savings!"}
                 </p>
               </div>
             </div>

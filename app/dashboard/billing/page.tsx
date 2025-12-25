@@ -141,7 +141,7 @@ export default async function BillingPage() {
               <div>
                 <h2 className="text-xl font-bold text-text">Pay-Per-Project</h2>
                 <p className="text-text-light">
-                  You're on pay-per-project pricing
+                  {"You're on pay-per-project pricing"}
                 </p>
               </div>
             </div>
@@ -368,7 +368,7 @@ export default async function BillingPage() {
             </div>
             <div className="p-5">
               <p className="text-text-light text-sm mb-4">
-                Payments are handled securely via invoice. You'll receive a payment link when your quote is approved.
+                {"Payments are handled securely via invoice. You'll receive a payment link when your quote is approved."}
               </p>
               <div className="flex gap-2">
                 <div className="bg-dark-elevated rounded px-3 py-1 text-xs text-text-muted">

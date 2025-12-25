@@ -554,7 +554,7 @@ function TestimonialCard({ text, author, company, initials }: {
 }) {
   return (
     <div className="bg-dark-surface p-8 rounded-3xl shadow-soft border border-border relative">
-      <div className="absolute top-6 right-8 text-7xl font-display text-walnut/20 leading-none">"</div>
+      <div className="absolute top-6 right-8 text-7xl font-display text-walnut/20 leading-none">{'"'}</div>
       <div className="text-accent text-xl mb-4">★★★★★</div>
       <p className="text-text mb-6 relative z-10 leading-relaxed">{text}</p>
       <div className="flex items-center gap-4">
