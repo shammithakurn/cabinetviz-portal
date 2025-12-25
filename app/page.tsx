@@ -153,8 +153,8 @@ export default async function HomePage() {
 
         {/* Hero Image */}
         <div className="absolute right-[6%] top-1/2 -translate-y-1/2 w-[45%] max-w-[600px] hidden lg:block animate-float">
-          {(theme.image_hero_main || theme.hero_image) ? (
-            <img src={theme.image_hero_main || theme.hero_image} alt="Hero" className="w-full rounded-3xl shadow-2xl" />
+          {(theme.image_hero_main || theme.image_hero_background || theme.hero_image) ? (
+            <img src={theme.image_hero_main || theme.image_hero_background || theme.hero_image} alt="Hero" className="w-full rounded-3xl shadow-2xl" />
           ) : (
             <div className="w-full aspect-[4/3] bg-gradient-to-br from-dark-elevated via-dark-surface to-cream rounded-3xl shadow-2xl flex items-center justify-center border border-border">
               <div className="text-8xl">{theme.hero_icon}</div>
