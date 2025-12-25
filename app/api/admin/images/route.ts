@@ -81,14 +81,22 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Failed to upload image:', error)
 
-    // Check if it's a configuration error
-    if (error instanceof Error && error.message.includes('BLOB_READ_WRITE_TOKEN')) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+
+    // Check for specific error types
+    if (errorMessage.includes('BLOB_READ_WRITE_TOKEN') || errorMessage.includes('token')) {
       return NextResponse.json({
         error: 'Blob storage not configured. Please add BLOB_READ_WRITE_TOKEN to environment variables.'
       }, { status: 500 })
     }
 
-    return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 })
+    if (errorMessage.includes('Forbidden') || errorMessage.includes('403')) {
+      return NextResponse.json({
+        error: 'Blob storage access denied. Please check your BLOB_READ_WRITE_TOKEN is valid and linked to your Blob store.'
+      }, { status: 403 })
+    }
+
+    return NextResponse.json({ error: `Failed to upload image: ${errorMessage}` }, { status: 500 })
   }
 }
 

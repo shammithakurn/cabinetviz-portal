@@ -97,7 +97,7 @@ interface FestivalSettings {
   preFestivalDays: number
 }
 
-const ANIMATION_TYPES = ['snowfall', 'fireworks', 'confetti', 'hearts', 'diyas', 'leaves', 'lanterns', 'stars', 'custom']
+const ANIMATION_TYPES = ['snowfall', 'fireworks', 'confetti', 'hearts', 'diyas', 'leaves', 'lanterns', 'stars', 'halloween', 'newyear', 'valentine', 'easter', 'holi', 'chinesenewyear', 'eid', 'hanukkah', 'patriotic', 'midautumn', 'thanksgiving', 'stpatricks', 'diadelosmuertos', 'mothersday', 'earthday', 'custom']
 const INTENSITY_LEVELS = ['low', 'medium', 'high']
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
@@ -1084,6 +1084,21 @@ export default function FestivalManagementPage() {
                     {anim === 'leaves' && '🍂'}
                     {anim === 'lanterns' && '🏮'}
                     {anim === 'stars' && '⭐'}
+                    {anim === 'halloween' && '🎃'}
+                    {anim === 'newyear' && '🎆'}
+                    {anim === 'valentine' && '💕'}
+                    {anim === 'easter' && '🐰'}
+                    {anim === 'holi' && '🎨'}
+                    {anim === 'chinesenewyear' && '🧧'}
+                    {anim === 'eid' && '🌙'}
+                    {anim === 'hanukkah' && '🕎'}
+                    {anim === 'patriotic' && '🎆'}
+                    {anim === 'midautumn' && '🥮'}
+                    {anim === 'thanksgiving' && '🦃'}
+                    {anim === 'stpatricks' && '☘️'}
+                    {anim === 'diadelosmuertos' && '💀'}
+                    {anim === 'mothersday' && '💐'}
+                    {anim === 'earthday' && '🌍'}
                   </div>
                   <p className="text-sm font-semibold text-gray-800 capitalize">{anim}</p>
                   <p className="text-xs text-gray-600 mt-1">
@@ -1095,6 +1110,21 @@ export default function FestivalManagementPage() {
                     {anim === 'leaves' && 'Autumn leaves falling'}
                     {anim === 'lanterns' && 'Floating lanterns'}
                     {anim === 'stars' && 'Twinkling stars'}
+                    {anim === 'halloween' && 'Spooky Halloween'}
+                    {anim === 'newyear' && 'New Year fireworks'}
+                    {anim === 'valentine' && 'Hearts and roses'}
+                    {anim === 'easter' && 'Eggs and bunnies'}
+                    {anim === 'holi' && 'Colorful powder'}
+                    {anim === 'chinesenewyear' && 'Dragons and lanterns'}
+                    {anim === 'eid' && 'Crescents and stars'}
+                    {anim === 'hanukkah' && 'Menorahs and dreidels'}
+                    {anim === 'patriotic' && 'Flags and fireworks'}
+                    {anim === 'midautumn' && 'Moon and mooncakes'}
+                    {anim === 'thanksgiving' && 'Harvest and turkey'}
+                    {anim === 'stpatricks' && 'Shamrocks and gold'}
+                    {anim === 'diadelosmuertos' && 'Skulls and marigolds'}
+                    {anim === 'mothersday' && 'Flowers and hearts'}
+                    {anim === 'earthday' && 'Nature and earth'}
                   </p>
                 </div>
               ))}

@@ -7,6 +7,20 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 
+// Helper to parse date string and add days without timezone issues
+function addDaysToDateString(dateStr: string, days: number): Date {
+  // Parse YYYY-MM-DD as local date components
+  const [year, month, day] = dateStr.split('T')[0].split('-').map(Number)
+  // Create date with added days using date components (avoids timezone issues)
+  return new Date(year, month - 1, day + days, 12, 0, 0)
+}
+
+// Helper to parse date string as local date
+function parseDateStringLocal(dateStr: string): Date {
+  const [year, month, day] = dateStr.split('T')[0].split('-').map(Number)
+  return new Date(year, month - 1, day, 12, 0, 0)
+}
+
 // GET - Fetch all custom festivals
 export async function GET(request: NextRequest) {
   try {
@@ -75,13 +89,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Calculate end date: for duration=1, end = start; for duration=2, end = start + 1 day, etc.
+    const festivalDuration = duration || 1
+    const calculatedEndDate = endDate
+      ? parseDateStringLocal(endDate)
+      : addDaysToDateString(startDate, festivalDuration - 1)
+
     const festival = await prisma.customFestival.create({
       data: {
         name: name.toLowerCase().replace(/\s+/g, '-'),
         displayName,
-        startDate: new Date(startDate),
-        endDate: endDate ? new Date(endDate) : new Date(new Date(startDate).getTime() + (duration || 1) * 24 * 60 * 60 * 1000),
-        duration: duration || 1,
+        startDate: parseDateStringLocal(startDate),
+        endDate: calculatedEndDate,
+        duration: festivalDuration,
         isRecurring: isRecurring || false,
         colors: JSON.stringify(colors || { primary: '#FF6B6B', secondary: '#4ECDC4', accent: '#FFE66D' }),
         animation: animation || 'confetti',
@@ -133,9 +153,14 @@ export async function PUT(request: NextRequest) {
     const data: Record<string, unknown> = {}
     if (updateData.name) data.name = updateData.name.toLowerCase().replace(/\s+/g, '-')
     if (updateData.displayName) data.displayName = updateData.displayName
-    if (updateData.startDate) data.startDate = new Date(updateData.startDate)
-    if (updateData.endDate) data.endDate = new Date(updateData.endDate)
+    if (updateData.startDate) data.startDate = parseDateStringLocal(updateData.startDate)
+    if (updateData.endDate) data.endDate = parseDateStringLocal(updateData.endDate)
     if (updateData.duration) data.duration = updateData.duration
+
+    // If startDate and duration are provided but no endDate, recalculate endDate
+    if (updateData.startDate && updateData.duration && !updateData.endDate) {
+      data.endDate = addDaysToDateString(updateData.startDate, updateData.duration - 1)
+    }
     if (typeof updateData.isRecurring === 'boolean') data.isRecurring = updateData.isRecurring
     if (updateData.colors) data.colors = JSON.stringify(updateData.colors)
     if (updateData.animation) data.animation = updateData.animation

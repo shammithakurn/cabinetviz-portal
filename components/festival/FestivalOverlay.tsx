@@ -12,6 +12,21 @@ import {
   Stars,
   Fireworks,
   Confetti,
+  Halloween,
+  NewYear,
+  Valentine,
+  Easter,
+  Holi,
+  ChineseNewYear,
+  Eid,
+  Hanukkah,
+  Patriotic,
+  MidAutumn,
+  Thanksgiving,
+  StPatricks,
+  DiaDeLosMuertos,
+  MothersDay,
+  EarthDay,
   CustomAnimation,
 } from './animations'
 
@@ -49,6 +64,21 @@ const AnimationComponents: Record<Exclude<AnimationType, 'custom'>, React.Compon
   stars: Stars,
   fireworks: Fireworks,
   confetti: Confetti,
+  halloween: Halloween,
+  newyear: NewYear,
+  valentine: Valentine,
+  easter: Easter,
+  holi: Holi,
+  chinesenewyear: ChineseNewYear,
+  eid: Eid,
+  hanukkah: Hanukkah,
+  patriotic: Patriotic,
+  midautumn: MidAutumn,
+  thanksgiving: Thanksgiving,
+  stpatricks: StPatricks,
+  diadelosmuertos: DiaDeLosMuertos,
+  mothersday: MothersDay,
+  earthday: EarthDay,
 }
 
 export function FestivalOverlay({
@@ -60,13 +90,21 @@ export function FestivalOverlay({
 }: FestivalOverlayProps) {
   const [bannerDismissed, setBannerDismissed] = useState(false)
   const [animationsDisabled, setAnimationsDisabled] = useState(false)
+  const [isClient, setIsClient] = useState(false)
+
+  // Ensure we're on the client before reading localStorage
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   // Check localStorage for user preferences
   useEffect(() => {
+    if (!isClient) return
+
     const bannerKey = festival ? `festival-banner-${festival.id}` : ''
     const animationsKey = 'festival-animations-disabled'
 
-    if (bannerKey && typeof window !== 'undefined') {
+    if (bannerKey) {
       const dismissed = localStorage.getItem(bannerKey)
       // Only use stored value if it was set today
       if (dismissed) {
@@ -78,10 +116,9 @@ export function FestivalOverlay({
       }
     }
 
-    if (typeof window !== 'undefined') {
-      setAnimationsDisabled(localStorage.getItem(animationsKey) === 'true')
-    }
-  }, [festival])
+    const storedValue = localStorage.getItem(animationsKey)
+    setAnimationsDisabled(storedValue === 'true')
+  }, [festival, isClient])
 
   const handleBannerDismiss = () => {
     setBannerDismissed(true)
@@ -90,12 +127,14 @@ export function FestivalOverlay({
     }
   }
 
-  const toggleAnimations = () => {
-    const newValue = !animationsDisabled
-    setAnimationsDisabled(newValue)
-    if (typeof window !== 'undefined') {
+  const toggleAnimations = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setAnimationsDisabled(prev => {
+      const newValue = !prev
       localStorage.setItem('festival-animations-disabled', String(newValue))
-    }
+      return newValue
+    })
   }
 
   // If no festival, don't render anything
@@ -107,6 +146,9 @@ export function FestivalOverlay({
   const isCustomAnimation = festival.animation === 'custom'
   const AnimationComponent = isCustomAnimation ? null : AnimationComponents[festival.animation as Exclude<AnimationType, 'custom'>]
 
+  // Only show animations after client has loaded to avoid hydration mismatch
+  const shouldShowAnimation = isClient && showAnimations && !animationsDisabled
+
   return (
     <>
       {/* Festival Banner */}
@@ -115,19 +157,27 @@ export function FestivalOverlay({
       )}
 
       {/* Animation Overlay */}
-      {showAnimations && !animationsDisabled && isCustomAnimation && (
+      {shouldShowAnimation && isCustomAnimation && (
         <CustomAnimation intensity={festival.intensity} config={customAnimationConfig} />
       )}
-      {showAnimations && !animationsDisabled && !isCustomAnimation && AnimationComponent && (
+      {shouldShowAnimation && !isCustomAnimation && festival.animation === 'patriotic' && (
+        <Patriotic
+          intensity={festival.intensity}
+          colors={[festival.colors.primary, festival.colors.secondary, festival.colors.accent]}
+        />
+      )}
+      {shouldShowAnimation && !isCustomAnimation && festival.animation !== 'patriotic' && AnimationComponent && (
         <AnimationComponent intensity={festival.intensity} />
       )}
 
       {/* Animation Toggle Button (bottom right corner) */}
-      {showAnimations && (
+      {showAnimations && isClient && (
         <button
           onClick={toggleAnimations}
-          className="fixed bottom-4 right-4 z-50 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-lg hover:bg-white transition-colors"
+          type="button"
+          className="fixed bottom-4 right-4 z-50 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-lg hover:bg-white transition-colors cursor-pointer"
           title={animationsDisabled ? 'Enable animations' : 'Disable animations'}
+          aria-label={animationsDisabled ? 'Enable animations' : 'Disable animations'}
         >
           {animationsDisabled ? (
             <svg
