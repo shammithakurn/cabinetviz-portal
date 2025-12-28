@@ -1,10 +1,12 @@
 // lib/auth.ts
 // Authentication utilities - JWT tokens, password hashing, session management
+// Supports both legacy JWT auth and NextAuth.js v5
 
 import { SignJWT, jwtVerify } from 'jose'
 import bcrypt from 'bcryptjs'
 import { cookies } from 'next/headers'
 import { prisma } from './db'
+import { auth } from './next-auth'
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'default-secret-change-in-production'
@@ -64,6 +66,29 @@ export async function getSession(): Promise<UserPayload | null> {
 }
 
 export async function getCurrentUser() {
+  // First, try NextAuth session
+  const nextAuthSession = await auth()
+  if (nextAuthSession?.user) {
+    const user = await prisma.user.findUnique({
+      where: { id: nextAuthSession.user.id },
+      select: {
+        id: true,
+        email: true,
+        emailVerified: true,
+        name: true,
+        company: true,
+        phone: true,
+        role: true,
+        avatar: true,
+        image: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    })
+    return user
+  }
+
+  // Fall back to legacy JWT session
   const session = await getSession()
   if (!session) return null
 
@@ -72,11 +97,13 @@ export async function getCurrentUser() {
     select: {
       id: true,
       email: true,
+      emailVerified: true,
       name: true,
       company: true,
       phone: true,
       role: true,
       avatar: true,
+      image: true,
       createdAt: true,
       updatedAt: true,
     },
