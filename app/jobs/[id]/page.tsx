@@ -1,5 +1,5 @@
 // app/jobs/[id]/page.tsx
-// Job detail page with status, files, comments, and deliverables
+// Job detail page with status, files, messages, and deliverables
 
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -14,7 +14,8 @@ import {
   getProjectTypeIcon,
   getProjectTypeLabel,
 } from '@/lib/utils'
-import { JobFileUploader } from '@/components/JobFileUploader'
+import { JobFileUploader } from '@/components/jobs/JobFileUploader'
+import { JobChat } from '@/components/jobs/JobChat'
 
 export default async function JobDetailPage({
   params,
@@ -34,10 +35,6 @@ export default async function JobDetailPage({
         orderBy: { uploadedAt: 'desc' },
       },
       deliverables: {
-        orderBy: { createdAt: 'desc' },
-      },
-      comments: {
-        where: { isInternal: false },
         orderBy: { createdAt: 'desc' },
       },
       statusHistory: {
@@ -193,49 +190,15 @@ export default async function JobDetailPage({
             </div>
           </div>
 
-          {/* Comments */}
-          <div className="bg-dark-surface rounded-2xl border border-border p-6">
-            <h2 className="text-lg font-bold text-text mb-4">Comments</h2>
-
-            {job.comments.length === 0 ? (
-              <div className="text-center py-10 text-text-light">
-                <div className="text-5xl mb-3">💬</div>
-                <p className="font-medium">No comments yet</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {job.comments.map((comment) => (
-                  <div key={comment.id} className="flex gap-3">
-                    <div className="w-9 h-9 bg-walnut/20 rounded-full flex items-center justify-center text-sm font-semibold text-walnut">
-                      {comment.authorName[0]}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-semibold text-text">
-                          {comment.authorName}
-                        </span>
-                        <span className="text-xs text-text-muted">
-                          {formatRelativeTime(comment.createdAt)}
-                        </span>
-                      </div>
-                      <p className="text-text-light">{comment.content}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Add Comment Form */}
-            <form className="mt-6 pt-6 border-t border-border">
-              <textarea
-                className="input min-h-[80px] mb-3"
-                placeholder="Add a comment or ask a question..."
-              />
-              <button type="submit" className="btn btn-primary">
-                Send Comment
-              </button>
-            </form>
-          </div>
+          {/* Messages */}
+          <JobChat
+            jobId={job.id}
+            currentUser={{
+              id: user.id,
+              name: user.name,
+              role: user.role,
+            }}
+          />
         </div>
 
         {/* Sidebar */}

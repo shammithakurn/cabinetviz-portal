@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
         skip: offset,
         include: {
           _count: {
-            select: { files: true, deliverables: true, comments: true },
+            select: { files: true, deliverables: true, messages: true },
           },
         },
       }),

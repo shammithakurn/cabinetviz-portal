@@ -6,6 +6,7 @@ import { notFound, redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
+import { JobChat } from '@/components/jobs/JobChat'
 
 interface Props {
   params: { id: string }
@@ -26,9 +27,6 @@ export default async function AdminJobDetailPage({ params }: Props) {
       },
       files: {
         orderBy: { uploadedAt: 'desc' },
-      },
-      comments: {
-        orderBy: { createdAt: 'desc' },
       },
       statusHistory: {
         orderBy: { changedAt: 'desc' },
@@ -81,31 +79,6 @@ export default async function AdminJobDetailPage({ params }: Props) {
         },
       })
     }
-
-    revalidatePath(`/admin/jobs/${params.id}`)
-  }
-
-  async function addComment(formData: FormData) {
-    'use server'
-    const currentUser = await getCurrentUser()
-    if (!currentUser || (currentUser.role !== 'ADMIN' && currentUser.role !== 'DESIGNER')) {
-      return
-    }
-
-    const content = formData.get('content') as string
-    const isInternal = formData.get('isInternal') === 'on'
-
-    if (!content.trim()) return
-
-    await prisma.comment.create({
-      data: {
-        jobId: params.id,
-        content: content.trim(),
-        authorName: currentUser.name,
-        authorRole: currentUser.role,
-        isInternal,
-      },
-    })
 
     revalidatePath(`/admin/jobs/${params.id}`)
   }
@@ -418,78 +391,16 @@ export default async function AdminJobDetailPage({ params }: Props) {
             </div>
           </div>
 
-          {/* Comments */}
-          <div className="bg-dark-surface rounded-xl border border-border overflow-hidden">
-            <div className="p-5 border-b border-border bg-dark-elevated">
-              <h2 className="font-bold text-text flex items-center gap-2">
-                <span>💬</span> Comments & Notes
-              </h2>
-            </div>
-            <div className="p-5">
-              {/* Add Comment Form */}
-              <form action={addComment} className="mb-6">
-                <textarea
-                  name="content"
-                  rows={3}
-                  placeholder="Add a comment..."
-                  className="w-full px-4 py-3 border border-border bg-dark-elevated text-text rounded-lg focus:ring-2 focus:ring-walnut focus:border-walnut resize-none"
-                />
-                <div className="flex items-center justify-between mt-3">
-                  <label className="flex items-center gap-2 text-sm text-text-light">
-                    <input type="checkbox" name="isInternal" className="rounded border-border bg-dark-elevated" />
-                    Internal note (not visible to customer)
-                  </label>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-walnut text-white font-medium rounded-lg hover:bg-walnut-dark transition-colors"
-                  >
-                    Add Comment
-                  </button>
-                </div>
-              </form>
-
-              {/* Comments List */}
-              <div className="space-y-4">
-                {job.comments.map((comment) => (
-                  <div
-                    key={comment.id}
-                    className={`p-4 rounded-lg ${
-                      comment.isInternal
-                        ? 'bg-yellow-900/20 border border-yellow-700/30'
-                        : comment.authorRole === 'CUSTOMER'
-                        ? 'bg-dark-elevated'
-                        : 'bg-walnut/10'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="font-medium text-text">{comment.authorName}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${
-                        comment.authorRole === 'CUSTOMER'
-                          ? 'bg-gray-700/50 text-gray-300'
-                          : comment.authorRole === 'ADMIN'
-                          ? 'bg-red-900/30 text-red-400'
-                          : 'bg-purple-900/30 text-purple-400'
-                      }`}>
-                        {comment.authorRole}
-                      </span>
-                      {comment.isInternal && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-900/30 text-yellow-400">
-                          🔒 Internal
-                        </span>
-                      )}
-                      <span className="text-xs text-text-muted ml-auto">
-                        {new Date(comment.createdAt).toLocaleString()}
-                      </span>
-                    </div>
-                    <p className="text-text-light">{comment.content}</p>
-                  </div>
-                ))}
-                {job.comments.length === 0 && (
-                  <p className="text-text-light text-center py-4">No comments yet</p>
-                )}
-              </div>
-            </div>
-          </div>
+          {/* Messages */}
+          <JobChat
+            jobId={job.id}
+            currentUser={{
+              id: user.id,
+              name: user.name,
+              role: user.role,
+            }}
+            showInternalToggle={true}
+          />
         </div>
 
         {/* Sidebar - Right column */}

@@ -23,7 +23,7 @@ export default async function ReportsPage() {
     prisma.user.findMany({
       where: { role: 'CUSTOMER' },
     }),
-    prisma.comment.findMany(),
+    prisma.message.findMany(),
   ])
 
   // Job Statistics

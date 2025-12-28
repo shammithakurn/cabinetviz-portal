@@ -156,30 +156,38 @@ async function main() {
 
   console.log('✅ Created sample jobs:', [job1.jobNumber, job2.jobNumber, job3.jobNumber, job4.jobNumber].join(', '))
 
-  // Add some comments
-  await prisma.comment.createMany({
+  // Add some messages
+  await prisma.message.createMany({
     data: [
       {
         jobId: job1.id,
         content: 'Started working on the 3D model. Kitchen layout looks great!',
-        authorName: 'Sarah Designer',
-        authorRole: 'DESIGNER',
+        senderId: designer.id,
+        status: 'READ',
+        readAt: new Date(),
       },
       {
         jobId: job1.id,
         content: 'Can we explore a darker benchtop option as well?',
-        authorName: 'John Smith',
-        authorRole: 'CUSTOMER',
+        senderId: customer.id,
+        status: 'READ',
+        readAt: new Date(),
+      },
+      {
+        jobId: job1.id,
+        content: 'Sure! I will create an alternative render with darker benchtop options.',
+        senderId: designer.id,
+        status: 'DELIVERED',
       },
       {
         jobId: job2.id,
         content: 'Renders are ready for your review. Please check the deliverables section.',
-        authorName: 'Sarah Designer',
-        authorRole: 'DESIGNER',
+        senderId: designer.id,
+        status: 'DELIVERED',
       },
     ],
   })
-  console.log('✅ Created sample comments')
+  console.log('✅ Created sample messages')
 
   // Add status history
   await prisma.statusHistory.createMany({

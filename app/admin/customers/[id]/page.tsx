@@ -25,7 +25,7 @@ export default async function CustomerDetailPage({ params }: Props) {
         orderBy: { createdAt: 'desc' },
         include: {
           _count: {
-            select: { files: true, deliverables: true, comments: true },
+            select: { files: true, deliverables: true, messages: true },
           },
         },
       },
@@ -200,7 +200,7 @@ export default async function CustomerDetailPage({ params }: Props) {
                       <div className="flex items-center gap-4 mt-2 text-xs text-text-muted">
                         <span>📎 {job._count.files} files</span>
                         <span>📤 {job._count.deliverables} deliverables</span>
-                        <span>💬 {job._count.comments} comments</span>
+                        <span>💬 {job._count.messages} messages</span>
                       </div>
                     </div>
                     <div className="text-right">

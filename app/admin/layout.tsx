@@ -25,12 +25,13 @@ export default async function AdminLayout({
   }
 
   // Fetch dynamic counts for sidebar badges
-  const [pendingCount, reviewCount, unreadComments] = await Promise.all([
+  const [pendingCount, reviewCount, unreadMessages] = await Promise.all([
     prisma.job.count({ where: { status: 'PENDING' } }),
     prisma.job.count({ where: { status: 'REVIEW' } }),
-    prisma.comment.count({
+    prisma.message.count({
       where: {
-        authorRole: 'CUSTOMER',
+        sender: { role: 'CUSTOMER' },
+        status: { not: 'READ' },
         createdAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }, // Last 24 hours
       },
     }),

@@ -35,7 +35,7 @@ export default async function AdminDashboardPage() {
         select: { name: true, email: true, company: true },
       },
       _count: {
-        select: { files: true, deliverables: true, comments: true },
+        select: { files: true, deliverables: true, messages: true },
       },
     },
   })
@@ -45,12 +45,13 @@ export default async function AdminDashboardPage() {
     where: { role: 'CUSTOMER' },
   })
 
-  // Recent activity (comments)
-  const recentComments = await prisma.comment.findMany({
+  // Recent activity (messages)
+  const recentMessages = await prisma.message.findMany({
     orderBy: { createdAt: 'desc' },
     take: 5,
     include: {
       job: { select: { title: true, jobNumber: true, id: true } },
+      sender: { select: { name: true, role: true } },
     },
   })
 
@@ -435,10 +436,10 @@ export default async function AdminDashboardPage() {
               <h2 className="text-lg font-bold text-text">Recent Activity</h2>
             </div>
             <div className="p-4 space-y-4">
-              {recentComments.map((comment) => (
+              {recentMessages.map((message) => (
                 <Link
-                  key={comment.id}
-                  href={`/admin/jobs/${comment.job.id}`}
+                  key={message.id}
+                  href={`/admin/jobs/${message.job.id}`}
                   className="flex gap-3 p-3 rounded-lg hover:bg-dark-elevated transition-colors"
                 >
                   <div className="w-8 h-8 bg-dark-elevated rounded-full flex items-center justify-center text-sm">
@@ -446,16 +447,16 @@ export default async function AdminDashboardPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-text truncate">
-                      {comment.authorName}
+                      {message.sender.name}
                     </p>
-                    <p className="text-sm text-text-light truncate">{comment.content}</p>
+                    <p className="text-sm text-text-light truncate">{message.content}</p>
                     <p className="text-xs text-text-muted mt-1">
-                      on {comment.job.jobNumber}
+                      on {message.job.jobNumber}
                     </p>
                   </div>
                 </Link>
               ))}
-              {recentComments.length === 0 && (
+              {recentMessages.length === 0 && (
                 <p className="text-center text-text-light py-8">No recent activity</p>
               )}
             </div>

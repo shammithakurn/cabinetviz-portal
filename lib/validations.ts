@@ -80,11 +80,11 @@ export const updateJobSchema = createJobSchema.partial().extend({
 })
 
 // ============================================
-// COMMENT SCHEMA
+// MESSAGE SCHEMA
 // ============================================
 
-export const commentSchema = z.object({
-  content: z.string().min(1, 'Comment cannot be empty'),
+export const messageSchema = z.object({
+  content: z.string().min(1, 'Message cannot be empty'),
   isInternal: z.boolean().default(false),
 })
 
@@ -115,5 +115,5 @@ export type RegisterInput = z.infer<typeof registerSchema>
 export type LoginInput = z.infer<typeof loginSchema>
 export type CreateJobInput = z.infer<typeof createJobSchema>
 export type UpdateJobInput = z.infer<typeof updateJobSchema>
-export type CommentInput = z.infer<typeof commentSchema>
+export type MessageInput = z.infer<typeof messageSchema>
 export type FileUploadInput = z.infer<typeof fileUploadSchema>

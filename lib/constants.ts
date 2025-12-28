@@ -1,34 +1,57 @@
 // lib/constants.ts
-// Centralized constants for easy configuration
+// Re-exports from organized constants for backward compatibility
+// New code should import from '@/lib/constants/file-upload' etc.
 
-/**
- * Maximum file upload size in bytes
- * Vercel Serverless Function Limits:
- * - Hobby: 4.5MB
- * - Pro: 4.5MB (can be increased with Edge Functions)
- * - Enterprise: Configurable
- *
- * Update this value when upgrading Vercel plan
- */
-export const MAX_FILE_SIZE_BYTES = 4.5 * 1024 * 1024 // 4.5MB
+// File upload constants
+export {
+  MAX_FILE_SIZE_BYTES,
+  MAX_FILE_SIZE_MB,
+  formatFileSize,
+  getFileSizeError,
+  ALLOWED_IMAGE_TYPES,
+  ALLOWED_DOCUMENT_TYPES,
+  ALLOWED_FILE_TYPES,
+  isAllowedFileType,
+  isImageType,
+} from './constants/file-upload'
 
-/**
- * Maximum file upload size in MB (for display purposes)
- */
-export const MAX_FILE_SIZE_MB = 4.5
+// Pricing constants
+export {
+  PACKAGES,
+  PACKAGE_PRICES,
+  PACKAGE_FEATURES,
+  BILLING_CYCLES,
+  PARTNER_LIMITS,
+  CURRENCY,
+  formatPrice,
+} from './constants/pricing'
 
-/**
- * Format file size for display
- */
-export function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`
-}
+// Job status constants
+export {
+  JOB_STATUS,
+  JOB_STATUS_LABELS,
+  JOB_STATUS_COLORS,
+  JOB_STATUS_TRANSITIONS,
+  PROJECT_TYPES,
+  PROJECT_TYPE_LABELS,
+  PROJECT_TYPE_ICONS,
+  FILE_CATEGORIES,
+  DELIVERABLE_TYPES,
+  isValidStatusTransition,
+  getStatusLabel,
+  getStatusColor,
+  getProjectTypeLabel,
+  getProjectTypeIcon,
+} from './constants/job-status'
 
-/**
- * Get error message for file size limit exceeded
- */
-export function getFileSizeError(fileName: string, fileSize: number): string {
-  return `File "${fileName}" is too large (${formatFileSize(fileSize)}). Maximum allowed size is ${MAX_FILE_SIZE_MB}MB.`
-}
+// Route constants
+export {
+  PUBLIC_ROUTES,
+  DASHBOARD_ROUTES,
+  JOB_ROUTES,
+  ADMIN_ROUTES,
+  API_ROUTES,
+  isPublicRoute,
+  isAdminRoute,
+  getPostLoginRedirect,
+} from './constants/routes'

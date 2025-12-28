@@ -31,6 +31,7 @@ model User {
   notifications       Notification[]
   subscription        Subscription?
   payments            Payment[]
+  sentMessages        Message[] @relation("SentMessages")
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -241,7 +242,7 @@ model Job {
   userId        String
   user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   files         JobFile[]
-  comments      Comment[]
+  messages      Message[]
   statusHistory StatusHistory[]
   deliverables  Deliverable[]
 
@@ -290,21 +291,37 @@ model Deliverable {
 }
 
 // ============================================
-// COMMENTS & COMMUNICATION
+// MESSAGES & COMMUNICATION
 // ============================================
 
-model Comment {
-  id          String    @id @default(cuid())
+enum MessageStatus {
+  SENT        // Message created
+  DELIVERED   // Server received (immediate)
+  READ        // Recipient viewed
+}
+
+model Message {
+  id          String        @id @default(cuid())
   content     String
-  authorName  String
-  authorRole  String    // CUSTOMER, ADMIN, DESIGNER
-  isInternal  Boolean   @default(false) // Internal notes not visible to customer
 
-  // Relationships
+  // Sender info
+  senderId    String
+  sender      User          @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+
+  // Job relationship
   jobId       String
-  job         Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  job         Job           @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime  @default(now())
+  // Message status
+  status      MessageStatus @default(SENT)
+  readAt      DateTime?
+
+  // Internal notes (admin-only visibility)
+  isInternal  Boolean       @default(false)
+
+  // Timestamps
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
 // ============================================

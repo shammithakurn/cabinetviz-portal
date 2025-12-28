@@ -18,7 +18,7 @@ export default async function MyJobsPage() {
     orderBy: { createdAt: 'desc' },
     include: {
       _count: {
-        select: { files: true, deliverables: true, comments: true },
+        select: { files: true, deliverables: true, messages: true },
       },
     },
   })
@@ -124,7 +124,7 @@ export default async function MyJobsPage() {
                     <div className="flex items-center gap-4 text-sm text-text-light">
                       <span>📎 {job._count.files}</span>
                       <span>📥 {job._count.deliverables}</span>
-                      <span>💬 {job._count.comments}</span>
+                      <span>💬 {job._count.messages}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">

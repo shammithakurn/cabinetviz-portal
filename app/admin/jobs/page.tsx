@@ -41,7 +41,7 @@ export default async function AdminJobsPage({
         select: { name: true, email: true, company: true },
       },
       _count: {
-        select: { files: true, deliverables: true, comments: true },
+        select: { files: true, deliverables: true, messages: true },
       },
     },
   })
@@ -189,7 +189,7 @@ export default async function AdminJobsPage({
                     <div className="flex items-center gap-3 text-sm text-text-light">
                       <span title="Uploaded files">📎 {job._count.files}</span>
                       <span title="Deliverables">📤 {job._count.deliverables}</span>
-                      <span title="Comments">💬 {job._count.comments}</span>
+                      <span title="Messages">💬 {job._count.messages}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
