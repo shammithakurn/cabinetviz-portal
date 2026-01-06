@@ -93,29 +93,31 @@ model VerificationToken {
 model Subscription {
   id              String    @id @default(cuid())
 
-  // Plan Details
-  plan            String    // PARTNER (only subscription plan)
-  status          String    @default("ACTIVE") // ACTIVE, PAUSED, CANCELLED, EXPIRED, PENDING
+  // Plan Details - Now supports multiple tiers: STARTER, PRO, ENTERPRISE
+  plan            String    // STARTER, PRO, ENTERPRISE
+  status          String    @default("ACTIVE") // ACTIVE, PAUSED, CANCELLED, EXPIRED, PENDING, PAST_DUE, TRIALING
 
   // Billing Cycle
   billingCycle    String    @default("MONTHLY") // MONTHLY, YEARLY
-  pricePerCycle   Float     @default(499) // $499/month for Partner
+  pricePerCycle   Float     // Price charged per billing cycle
 
   // Dates
   startDate       DateTime  @default(now())
   currentPeriodStart DateTime @default(now())
   currentPeriodEnd   DateTime
   cancelledAt     DateTime?
+  cancelAtPeriodEnd Boolean  @default(false) // If true, cancels at end of current period
 
-  // Usage Tracking (for Partner plan: 5 projects/month)
+  // Usage Tracking
   projectsUsedThisMonth Int @default(0)
-  projectsLimit   Int       @default(5) // Partner gets 5/month
+  projectsLimit   Int       @default(5) // Varies by plan
   lastResetDate   DateTime  @default(now()) // When usage was last reset
 
-  // Payment Integration (future-ready)
-  stripeCustomerId     String?
-  stripeSubscriptionId String?
-  paymentMethod        String? // CARD, BANK_TRANSFER, INVOICE
+  // Stripe Integration
+  stripeCustomerId     String?  @unique // Stripe customer ID (cus_xxx)
+  stripeSubscriptionId String?  @unique // Stripe subscription ID (sub_xxx)
+  stripePriceId        String?  // Current Stripe price ID (price_xxx)
+  paymentMethod        String?  // CARD, BANK_TRANSFER, INVOICE
 
   // Admin Notes
   notes           String?
@@ -152,10 +154,14 @@ model Payment {
   invoiceUrl      String?   // URL to PDF invoice
   invoiceSentAt   DateTime?
 
-  // Payment Processing (future-ready for Stripe)
-  stripePaymentIntentId String?
-  stripeInvoiceId       String?
-  paymentMethod         String? // CARD, BANK_TRANSFER, CASH, OTHER
+  // Stripe Integration
+  stripePaymentIntentId String?  @unique // Stripe PaymentIntent ID (pi_xxx)
+  stripeCheckoutSessionId String? // Stripe Checkout Session ID (cs_xxx)
+  stripeInvoiceId       String?  // Stripe Invoice ID (in_xxx)
+  stripeChargeId        String?  // Stripe Charge ID (ch_xxx)
+  paymentMethod         String?  // CARD, BANK_TRANSFER, CASH, OTHER
+  cardLast4             String?  // Last 4 digits of card
+  cardBrand             String?  // visa, mastercard, amex, etc.
   paidAt                DateTime?
 
   // Admin

@@ -1,9 +1,12 @@
 // app/dashboard/billing/page.tsx
 // Customer billing page with subscription and payment management
+// Integrated with Stripe for payment processing
 
 import Link from 'next/link'
 import { getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { SubscriptionManager } from '@/components/stripe/SubscriptionManager'
+import { formatPrice } from '@/lib/constants/pricing'
 
 export default async function BillingPage() {
   const user = await getCurrentUser()
@@ -76,87 +79,22 @@ export default async function BillingPage() {
         </p>
       </div>
 
-      {/* Subscription Card */}
-      {subscription ? (
-        <div className="bg-gradient-to-r from-blue-900/40 to-purple-900/40 rounded-2xl border border-blue-700/30 p-6 mb-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center text-4xl">
-                📦
-              </div>
-              <div>
-                <div className="flex items-center gap-3 mb-1">
-                  <h2 className="text-xl font-bold text-text">Partner Plan</h2>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    subscription.status === 'ACTIVE' ? 'bg-green-500/20 text-green-400' :
-                    subscription.status === 'PAUSED' ? 'bg-yellow-500/20 text-yellow-400' :
-                    'bg-red-500/20 text-red-400'
-                  }`}>
-                    {subscription.status}
-                  </span>
-                </div>
-                <p className="text-text-light">
-                  {formatCurrency(subscription.pricePerCycle)}/{subscription.billingCycle.toLowerCase()}
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <div className="bg-dark-surface/50 rounded-xl p-4">
-                <p className="text-xs text-text-light mb-1">Projects Used</p>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 h-2 bg-dark-elevated rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-blue-500 rounded-full"
-                      style={{ width: `${(subscription.projectsUsedThisMonth / subscription.projectsLimit) * 100}%` }}
-                    />
-                  </div>
-                  <span className="text-sm font-medium text-text">
-                    {subscription.projectsUsedThisMonth}/{subscription.projectsLimit}
-                  </span>
-                </div>
-              </div>
-              <div className="bg-dark-surface/50 rounded-xl p-4">
-                <p className="text-xs text-text-light mb-1">Current Period</p>
-                <p className="text-sm font-medium text-text">
-                  {formatDate(subscription.currentPeriodStart)} - {formatDate(subscription.currentPeriodEnd)}
-                </p>
-              </div>
-              <div className="bg-dark-surface/50 rounded-xl p-4">
-                <p className="text-xs text-text-light mb-1">Next Billing</p>
-                <p className="text-sm font-medium text-text">
-                  {formatDate(subscription.currentPeriodEnd)}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-gradient-to-r from-amber-900/30 to-orange-900/30 rounded-2xl border border-amber-700/30 p-6 mb-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-amber-500/20 rounded-2xl flex items-center justify-center text-4xl">
-                💼
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-text">Pay-Per-Project</h2>
-                <p className="text-text-light">
-                  {"You're on pay-per-project pricing"}
-                </p>
-              </div>
-            </div>
-            <div className="bg-dark-surface/50 rounded-xl p-5">
-              <h3 className="font-semibold text-text mb-2">Upgrade to Partner Plan</h3>
-              <p className="text-sm text-text-light mb-3">
-                $499/month for 5 projects. Save up to 50% on visualizations!
-              </p>
-              <button className="w-full px-4 py-2 bg-walnut text-white rounded-lg font-medium hover:bg-walnut-dark transition-colors text-sm">
-                Contact Sales
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Subscription Management - Powered by Stripe */}
+      <div className="mb-8">
+        <SubscriptionManager
+          subscription={subscription ? {
+            id: subscription.id,
+            plan: subscription.plan,
+            status: subscription.status,
+            billingCycle: subscription.billingCycle,
+            pricePerCycle: subscription.pricePerCycle,
+            currentPeriodEnd: subscription.currentPeriodEnd.toISOString(),
+            cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+            projectsUsedThisMonth: subscription.projectsUsedThisMonth,
+            projectsLimit: subscription.projectsLimit,
+          } : null}
+        />
+      </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">

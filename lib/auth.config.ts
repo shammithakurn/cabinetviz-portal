@@ -51,19 +51,20 @@ export const authConfig = {
     },
     async authorized({ auth, request }) {
       const isLoggedIn = !!auth?.user
-      const isOnDashboard = request.nextUrl.pathname.startsWith('/dashboard')
-      const isOnAdmin = request.nextUrl.pathname.startsWith('/admin')
-      const isOnJobs = request.nextUrl.pathname.startsWith('/jobs')
-      const isOnAuth = request.nextUrl.pathname.startsWith('/auth')
+      const pathname = request.nextUrl.pathname
+
+      // Skip auth callback routes - never redirect these
+      if (pathname.startsWith('/api/auth')) {
+        return true
+      }
 
       // Protect dashboard and jobs routes
-      if (isOnDashboard || isOnJobs) {
-        if (isLoggedIn) return true
-        return false // Redirect to login
+      if (pathname.startsWith('/dashboard') || pathname.startsWith('/jobs')) {
+        return isLoggedIn // Will redirect to signIn page if false
       }
 
       // Protect admin routes
-      if (isOnAdmin) {
+      if (pathname.startsWith('/admin')) {
         if (!isLoggedIn) return false
         const role = auth?.user?.role
         if (role !== 'ADMIN' && role !== 'DESIGNER') {
@@ -72,9 +73,11 @@ export const authConfig = {
         return true
       }
 
-      // Redirect logged in users away from auth pages
-      if (isOnAuth && isLoggedIn) {
-        return Response.redirect(new URL('/dashboard', request.nextUrl))
+      // Redirect logged in users away from auth pages (but not error page)
+      if (pathname.startsWith('/auth') && !pathname.startsWith('/auth/error')) {
+        if (isLoggedIn) {
+          return Response.redirect(new URL('/dashboard', request.nextUrl))
+        }
       }
 
       return true

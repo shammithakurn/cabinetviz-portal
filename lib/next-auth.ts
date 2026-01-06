@@ -8,13 +8,33 @@ import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/db'
 import { authConfig } from './auth.config'
 
+// Custom adapter to handle the 'name' field requirement
+const customAdapter = {
+  ...PrismaAdapter(prisma),
+  createUser: async (data: { email: string; emailVerified: Date | null; name?: string | null; image?: string | null }) => {
+    // Ensure name is set (use email prefix if not provided)
+    const name = data.name || data.email.split('@')[0]
+
+    const user = await prisma.user.create({
+      data: {
+        email: data.email,
+        emailVerified: data.emailVerified,
+        name: name,
+        image: data.image,
+        role: 'CUSTOMER', // Default role for new OAuth users
+      },
+    })
+    return user
+  },
+}
+
 export const {
   handlers: { GET, POST },
   auth,
   signIn,
   signOut,
 } = NextAuth({
-  adapter: PrismaAdapter(prisma),
+  adapter: customAdapter,
   ...authConfig,
   providers: [
     ...authConfig.providers,
@@ -104,6 +124,11 @@ export const {
           // Return user info with existing role
           user.id = existingUser.id
           user.role = existingUser.role
+        } else {
+          // New user - set name from Google profile
+          if (profile?.name) {
+            user.name = profile.name as string
+          }
         }
       }
 
@@ -142,15 +167,6 @@ export const {
         session.user.role = token.role as string
       }
       return session
-    },
-  },
-  events: {
-    async createUser({ user }) {
-      // Set default role for new OAuth users
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { role: 'CUSTOMER' },
-      })
     },
   },
 })
