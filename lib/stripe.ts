@@ -20,16 +20,27 @@ import {
 // STRIPE CLIENT INITIALIZATION
 // ============================================
 
-// Validate that we have the required environment variables
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('Missing STRIPE_SECRET_KEY environment variable')
+// Initialize Stripe with the secret key
+// Note: Will be null if STRIPE_SECRET_KEY is not set (allows build to succeed)
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY
+
+const stripeClient = stripeSecretKey
+  ? new Stripe(stripeSecretKey, { typescript: true })
+  : null
+
+/**
+ * Get the Stripe instance, throwing if not configured
+ * Use this in API routes to ensure Stripe is available
+ */
+function getStripe(): Stripe {
+  if (!stripeClient) {
+    throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.')
+  }
+  return stripeClient
 }
 
-// Initialize Stripe with the secret key
-// Using a recent stable API version
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  typescript: true,
-})
+// Export for external use (e.g., webhook verification)
+export { getStripe }
 
 // ============================================
 // CUSTOMER MANAGEMENT
@@ -44,6 +55,8 @@ export async function getOrCreateStripeCustomer(
   email: string,
   name?: string
 ): Promise<string> {
+  const stripe = getStripe()
+
   // First, check if user already has a subscription with a Stripe customer ID
   const existingSubscription = await prisma.subscription.findUnique({
     where: { userId },
@@ -87,6 +100,7 @@ export async function updateStripeCustomer(
     phone?: string
   }
 ): Promise<Stripe.Customer> {
+  const stripe = getStripe()
   return stripe.customers.update(customerId, updates)
 }
 
@@ -126,6 +140,8 @@ export async function createCheckoutSession({
   sessionId: string
   clientSecret: string
 }> {
+  const stripe = getStripe()
+
   // Get or create the Stripe customer
   const customerId = await getOrCreateStripeCustomer(userId, userEmail, userName)
 
@@ -268,6 +284,7 @@ export async function createSubscriptionCheckoutSession(
 export async function getCheckoutSession(
   sessionId: string
 ): Promise<Stripe.Checkout.Session> {
+  const stripe = getStripe()
   return stripe.checkout.sessions.retrieve(sessionId, {
     expand: ['line_items', 'customer', 'subscription', 'payment_intent'],
   })
@@ -310,6 +327,7 @@ export async function getCheckoutSessionStatus(sessionId: string): Promise<{
 export async function getStripeSubscription(
   subscriptionId: string
 ): Promise<Stripe.Subscription> {
+  const stripe = getStripe()
   return stripe.subscriptions.retrieve(subscriptionId, {
     expand: ['default_payment_method', 'latest_invoice'],
   })
@@ -322,6 +340,7 @@ export async function getStripeSubscription(
 export async function cancelSubscriptionAtPeriodEnd(
   subscriptionId: string
 ): Promise<Stripe.Subscription> {
+  const stripe = getStripe()
   return stripe.subscriptions.update(subscriptionId, {
     cancel_at_period_end: true,
   })
@@ -333,6 +352,7 @@ export async function cancelSubscriptionAtPeriodEnd(
 export async function cancelSubscriptionImmediately(
   subscriptionId: string
 ): Promise<Stripe.Subscription> {
+  const stripe = getStripe()
   return stripe.subscriptions.cancel(subscriptionId)
 }
 
@@ -342,6 +362,7 @@ export async function cancelSubscriptionImmediately(
 export async function resumeSubscription(
   subscriptionId: string
 ): Promise<Stripe.Subscription> {
+  const stripe = getStripe()
   return stripe.subscriptions.update(subscriptionId, {
     cancel_at_period_end: false,
   })
@@ -354,6 +375,7 @@ export async function updateSubscriptionPlan(
   subscriptionId: string,
   newPriceId: string
 ): Promise<Stripe.Subscription> {
+  const stripe = getStripe()
   const subscription = await stripe.subscriptions.retrieve(subscriptionId)
 
   return stripe.subscriptions.update(subscriptionId, {
@@ -379,6 +401,7 @@ export async function createCustomerPortalSession(
   customerId: string,
   returnUrl: string
 ): Promise<string> {
+  const stripe = getStripe()
   const session = await stripe.billingPortal.sessions.create({
     customer: customerId,
     return_url: returnUrl,
@@ -400,6 +423,7 @@ export async function createPaymentIntent(
   customerId: string,
   metadata?: Record<string, string>
 ): Promise<Stripe.PaymentIntent> {
+  const stripe = getStripe()
   return stripe.paymentIntents.create({
     amount: Math.round(amount * 100), // Convert to cents
     currency: CURRENCY.CODE.toLowerCase(),
@@ -423,6 +447,7 @@ export function constructWebhookEvent(
   rawBody: string | Buffer,
   signature: string
 ): Stripe.Event {
+  const stripe = getStripe()
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
   if (!webhookSecret) {
@@ -444,6 +469,7 @@ export async function getUpcomingInvoice(
   customerId: string,
   subscriptionId?: string
 ): Promise<Stripe.UpcomingInvoice> {
+  const stripe = getStripe()
   return stripe.invoices.createPreview({
     customer: customerId,
     subscription: subscriptionId,
@@ -457,6 +483,7 @@ export async function listInvoices(
   customerId: string,
   limit = 10
 ): Promise<Stripe.Invoice[]> {
+  const stripe = getStripe()
   const invoices = await stripe.invoices.list({
     customer: customerId,
     limit,
@@ -477,6 +504,7 @@ export async function createRefund(
   amount?: number, // Optional partial refund amount in dollars
   reason?: 'duplicate' | 'fraudulent' | 'requested_by_customer'
 ): Promise<Stripe.Refund> {
+  const stripe = getStripe()
   return stripe.refunds.create({
     payment_intent: paymentIntentId,
     amount: amount ? Math.round(amount * 100) : undefined, // Convert to cents if provided
@@ -493,6 +521,7 @@ export async function createRefund(
  * Useful for verifying prices match your configuration
  */
 export async function getPrice(priceId: string): Promise<Stripe.Price> {
+  const stripe = getStripe()
   return stripe.prices.retrieve(priceId, {
     expand: ['product'],
   })
@@ -502,6 +531,7 @@ export async function getPrice(priceId: string): Promise<Stripe.Price> {
  * List all active prices
  */
 export async function listActivePrices(): Promise<Stripe.Price[]> {
+  const stripe = getStripe()
   const prices = await stripe.prices.list({
     active: true,
     expand: ['data.product'],
