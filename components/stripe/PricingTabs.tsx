@@ -131,22 +131,24 @@ export function PricingTabs({
               </div>
 
               <div className="space-y-3 mb-6">
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-accent-gold">★</span>
-                  <span>{pkg.renders} 3D renders</span>
+                <div className="flex items-center gap-2 text-sm font-medium text-brand-700">
+                  <svg className="w-5 h-5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                  </svg>
+                  <span>{pkg.renders} Kitchen{pkg.renders > 1 ? 's' : ''}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <span className="text-accent-gold">★</span>
-                  <span>{pkg.revisions} revision{pkg.revisions > 1 ? 's' : ''}</span>
+                  <span>{pkg.revisions === 5 ? 'Unlimited' : pkg.revisions} revision{pkg.revisions > 1 ? 's' : ''}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <span className="text-accent-gold">★</span>
-                  <span>{pkg.deliveryDays}-day delivery</span>
+                  <span>{pkg.deliveryDays} business day delivery</span>
                 </div>
               </div>
 
               <ul className="space-y-2 mb-6">
-                {pkg.features.slice(3).map((feature, idx) => (
+                {pkg.features.slice(0, 4).map((feature, idx) => (
                   <li key={idx} className="flex items-start gap-2 text-sm text-muted">
                     <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

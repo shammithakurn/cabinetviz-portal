@@ -334,8 +334,9 @@ export default function NewJobPage() {
                     value={formData.package}
                     onChange={(e) => updateField('package', e.target.value)}
                   >
-                    <option value="BASIC">Basic ($79)</option>
-                    <option value="PROFESSIONAL">Professional ($149)</option>
+                    <option value="BASIC">Kitchen Basic - 1 Kitchen ($79)</option>
+                    <option value="PROFESSIONAL">Kitchen Professional - 4 Kitchens ($199)</option>
+                    <option value="PREMIUM">Kitchen Premium - 10 Kitchens ($499)</option>
                     <option value="PARTNER">Partner (Subscription)</option>
                   </select>
                 </div>

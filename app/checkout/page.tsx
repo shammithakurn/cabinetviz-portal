@@ -1,5 +1,5 @@
 // app/checkout/page.tsx
-// Checkout page with embedded Stripe checkout form
+// Checkout page with Stripe embedded checkout
 // Handles both one-time purchases and subscriptions
 
 export const dynamic = 'force-dynamic'
@@ -173,6 +173,8 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
                 planType={planType as 'STARTER' | 'PRO' | 'ENTERPRISE' | undefined}
                 billingCycle={billingCycle}
                 jobId={jobId}
+                productName={productName}
+                productPrice={productPrice}
               />
             </div>
 
