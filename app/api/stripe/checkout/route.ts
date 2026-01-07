@@ -12,6 +12,7 @@ import {
 } from '@/lib/stripe'
 import {
   ONE_TIME_PACKAGES,
+  ONE_TIME_PACKAGE_DETAILS,
   SUBSCRIPTION_PLANS,
   BILLING_CYCLES,
   type OneTimePackageType,
@@ -38,7 +39,9 @@ interface SubscriptionCheckoutRequest {
 type CheckoutRequest = OneTimeCheckoutRequest | SubscriptionCheckoutRequest
 
 function isValidOneTimePackage(value: string): value is OneTimePackageType {
-  return Object.values(ONE_TIME_PACKAGES).includes(value as OneTimePackageType)
+  // Check if it's a valid key (BASIC, PROFESSIONAL, PREMIUM)
+  return Object.keys(ONE_TIME_PACKAGES).includes(value) ||
+    Object.keys(ONE_TIME_PACKAGE_DETAILS).includes(value)
 }
 
 function isValidSubscriptionPlan(value: string): value is SubscriptionPlanType {

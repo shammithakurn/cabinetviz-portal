@@ -29,41 +29,56 @@ export function formatPrice(amount: number): string {
 }
 
 // ============================================
-// ONE-TIME SERVICE PACKAGES
+// PACKAGE CATEGORIES
 // ============================================
 
-export const ONE_TIME_PACKAGES = {
-  BASIC: 'BASIC',
-  PROFESSIONAL: 'PROFESSIONAL',
-  PREMIUM: 'PREMIUM',
+export const PACKAGE_CATEGORIES = {
+  KITCHEN: 'KITCHEN',
+  WARDROBE: 'WARDROBE',
 } as const
 
-export type OneTimePackageType = (typeof ONE_TIME_PACKAGES)[keyof typeof ONE_TIME_PACKAGES]
+export type PackageCategory = (typeof PACKAGE_CATEGORIES)[keyof typeof PACKAGE_CATEGORIES]
 
-export interface OneTimePackage {
-  id: OneTimePackageType
+// ============================================
+// KITCHEN PACKAGES
+// ============================================
+
+export const KITCHEN_PACKAGES = {
+  BASIC: 'KITCHEN_BASIC',
+  PROFESSIONAL: 'KITCHEN_PROFESSIONAL',
+  PREMIUM: 'KITCHEN_PREMIUM',
+} as const
+
+export type KitchenPackageType = (typeof KITCHEN_PACKAGES)[keyof typeof KITCHEN_PACKAGES]
+
+export interface Package {
+  id: string
+  category: PackageCategory
   name: string
   description: string
   price: number
   priceLabel: string
-  stripePriceId: string | null // Set from environment variable
-  renders: number
-  revisions: number
+  stripePriceId: string | null
+  units: number // Number of kitchens/wardrobes
+  unitLabel: string // "Kitchen" or "Wardrobe"
+  revisions: number | 'unlimited'
   deliveryDays: number
   features: string[]
   popular?: boolean
+  perUnit?: boolean // For bulk pricing like wardrobes
 }
 
-// Pricing for one-time kitchen visualization packages
-export const ONE_TIME_PACKAGE_DETAILS: Record<OneTimePackageType, OneTimePackage> = {
-  BASIC: {
-    id: 'BASIC',
+export const KITCHEN_PACKAGE_DETAILS: Record<KitchenPackageType, Package> = {
+  KITCHEN_BASIC: {
+    id: 'KITCHEN_BASIC',
+    category: 'KITCHEN',
     name: 'Kitchen Basic',
     description: 'Perfect for single kitchen projects',
     price: 79,
     priceLabel: '$79',
-    stripePriceId: process.env.STRIPE_PRICE_BASIC || null,
-    renders: 1,
+    stripePriceId: process.env.STRIPE_PRICE_KITCHEN_BASIC || null,
+    units: 1,
+    unitLabel: 'Kitchen',
     revisions: 1,
     deliveryDays: 5,
     features: [
@@ -75,14 +90,16 @@ export const ONE_TIME_PACKAGE_DETAILS: Record<OneTimePackageType, OneTimePackage
       '5 business day delivery',
     ],
   },
-  PROFESSIONAL: {
-    id: 'PROFESSIONAL',
+  KITCHEN_PROFESSIONAL: {
+    id: 'KITCHEN_PROFESSIONAL',
+    category: 'KITCHEN',
     name: 'Kitchen Professional',
     description: 'Best value for contractors',
     price: 199,
     priceLabel: '$199',
-    stripePriceId: process.env.STRIPE_PRICE_PROFESSIONAL || null,
-    renders: 4,
+    stripePriceId: process.env.STRIPE_PRICE_KITCHEN_PROFESSIONAL || null,
+    units: 4,
+    unitLabel: 'Kitchen',
     revisions: 2,
     deliveryDays: 3,
     popular: true,
@@ -96,15 +113,17 @@ export const ONE_TIME_PACKAGE_DETAILS: Record<OneTimePackageType, OneTimePackage
       '3 business day delivery',
     ],
   },
-  PREMIUM: {
-    id: 'PREMIUM',
+  KITCHEN_PREMIUM: {
+    id: 'KITCHEN_PREMIUM',
+    category: 'KITCHEN',
     name: 'Kitchen Premium',
     description: 'For builders & designers',
     price: 499,
     priceLabel: '$499',
-    stripePriceId: process.env.STRIPE_PRICE_PREMIUM || null,
-    renders: 10,
-    revisions: 5,
+    stripePriceId: process.env.STRIPE_PRICE_KITCHEN_PREMIUM || null,
+    units: 10,
+    unitLabel: 'Kitchen',
+    revisions: 'unlimited',
     deliveryDays: 2,
     features: [
       '10 Kitchen visualizations',
@@ -120,7 +139,230 @@ export const ONE_TIME_PACKAGE_DETAILS: Record<OneTimePackageType, OneTimePackage
 }
 
 // ============================================
-// SUBSCRIPTION PLANS
+// WARDROBE PACKAGES
+// ============================================
+
+export const WARDROBE_PACKAGES = {
+  SINGLE_WALL: 'WARDROBE_SINGLE_WALL',
+  MULTI_WALL: 'WARDROBE_MULTI_WALL',
+  BULK: 'WARDROBE_BULK',
+} as const
+
+export type WardrobePackageType = (typeof WARDROBE_PACKAGES)[keyof typeof WARDROBE_PACKAGES]
+
+export const WARDROBE_PACKAGE_DETAILS: Record<WardrobePackageType, Package> = {
+  WARDROBE_SINGLE_WALL: {
+    id: 'WARDROBE_SINGLE_WALL',
+    category: 'WARDROBE',
+    name: 'Single Wall Wardrobe',
+    description: 'Perfect for single wall wardrobe',
+    price: 20,
+    priceLabel: '$20',
+    stripePriceId: process.env.STRIPE_PRICE_WARDROBE_SINGLE || null,
+    units: 1,
+    unitLabel: 'Wardrobe',
+    revisions: 1,
+    deliveryDays: 3,
+    features: [
+      '1 Wardrobe visualization',
+      '2D Elevation views',
+      '2D Top view',
+      '3D View',
+      '1 revision round',
+      '3 business day delivery',
+    ],
+  },
+  WARDROBE_MULTI_WALL: {
+    id: 'WARDROBE_MULTI_WALL',
+    category: 'WARDROBE',
+    name: 'Multi Wall Wardrobe',
+    description: 'Perfect for multi wall wardrobe',
+    price: 40,
+    priceLabel: '$40',
+    stripePriceId: process.env.STRIPE_PRICE_WARDROBE_MULTI || null,
+    units: 1,
+    unitLabel: 'Wardrobe',
+    revisions: 1,
+    deliveryDays: 3,
+    features: [
+      '1 Multi-wall wardrobe',
+      '2D Elevation views',
+      '2D Top view',
+      '3D View',
+      '1 revision round',
+      '3 business day delivery',
+    ],
+  },
+  WARDROBE_BULK: {
+    id: 'WARDROBE_BULK',
+    category: 'WARDROBE',
+    name: 'Bulk Wardrobes (5+)',
+    description: 'Best value for bulk wardrobe projects',
+    price: 10,
+    priceLabel: '$10/each',
+    stripePriceId: process.env.STRIPE_PRICE_WARDROBE_BULK || null,
+    units: 5,
+    unitLabel: 'Wardrobe',
+    revisions: 1,
+    deliveryDays: 5,
+    perUnit: true,
+    popular: true,
+    features: [
+      '5+ Wardrobe visualizations',
+      '$10 per wardrobe',
+      '2D Elevation views',
+      '2D Top view',
+      '3D View',
+      'Bulk discount pricing',
+      '5 business day delivery',
+    ],
+  },
+}
+
+// ============================================
+// COMBINED PACKAGE ACCESS
+// ============================================
+
+export type AllPackageType = KitchenPackageType | WardrobePackageType
+
+export const ALL_PACKAGES = {
+  ...KITCHEN_PACKAGES,
+  ...WARDROBE_PACKAGES,
+} as const
+
+export const ALL_PACKAGE_DETAILS: Record<AllPackageType, Package> = {
+  ...KITCHEN_PACKAGE_DETAILS,
+  ...WARDROBE_PACKAGE_DETAILS,
+}
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+/**
+ * Get all kitchen packages as an array
+ */
+export function getKitchenPackagesArray(): Package[] {
+  return Object.values(KITCHEN_PACKAGE_DETAILS)
+}
+
+/**
+ * Get all wardrobe packages as an array
+ */
+export function getWardrobePackagesArray(): Package[] {
+  return Object.values(WARDROBE_PACKAGE_DETAILS)
+}
+
+/**
+ * Get all packages as an array
+ */
+export function getAllPackagesArray(): Package[] {
+  return Object.values(ALL_PACKAGE_DETAILS)
+}
+
+/**
+ * Get packages by category
+ */
+export function getPackagesByCategory(category: PackageCategory): Package[] {
+  return getAllPackagesArray().filter(pkg => pkg.category === category)
+}
+
+/**
+ * Get package by ID
+ */
+export function getPackageById(id: string): Package | undefined {
+  return ALL_PACKAGE_DETAILS[id as AllPackageType]
+}
+
+/**
+ * Get the Stripe price ID for a package
+ */
+export function getPackagePriceId(packageId: string): string | null {
+  const pkg = getPackageById(packageId)
+  return pkg?.stripePriceId || null
+}
+
+// ============================================
+// LEGACY EXPORTS (for backwards compatibility)
+// ============================================
+
+// Map old package types to new structure
+export const ONE_TIME_PACKAGES = {
+  BASIC: 'KITCHEN_BASIC',
+  PROFESSIONAL: 'KITCHEN_PROFESSIONAL',
+  PREMIUM: 'KITCHEN_PREMIUM',
+} as const
+
+export type OneTimePackageType = 'BASIC' | 'PROFESSIONAL' | 'PREMIUM'
+
+export interface OneTimePackage {
+  id: OneTimePackageType
+  name: string
+  description: string
+  price: number
+  priceLabel: string
+  stripePriceId: string | null
+  renders: number
+  revisions: number
+  deliveryDays: number
+  features: string[]
+  popular?: boolean
+}
+
+// Legacy mapping for existing code
+export const ONE_TIME_PACKAGE_DETAILS: Record<OneTimePackageType, OneTimePackage> = {
+  BASIC: {
+    id: 'BASIC',
+    name: KITCHEN_PACKAGE_DETAILS.KITCHEN_BASIC.name,
+    description: KITCHEN_PACKAGE_DETAILS.KITCHEN_BASIC.description,
+    price: KITCHEN_PACKAGE_DETAILS.KITCHEN_BASIC.price,
+    priceLabel: KITCHEN_PACKAGE_DETAILS.KITCHEN_BASIC.priceLabel,
+    stripePriceId: KITCHEN_PACKAGE_DETAILS.KITCHEN_BASIC.stripePriceId,
+    renders: KITCHEN_PACKAGE_DETAILS.KITCHEN_BASIC.units,
+    revisions: typeof KITCHEN_PACKAGE_DETAILS.KITCHEN_BASIC.revisions === 'number'
+      ? KITCHEN_PACKAGE_DETAILS.KITCHEN_BASIC.revisions : 99,
+    deliveryDays: KITCHEN_PACKAGE_DETAILS.KITCHEN_BASIC.deliveryDays,
+    features: KITCHEN_PACKAGE_DETAILS.KITCHEN_BASIC.features,
+  },
+  PROFESSIONAL: {
+    id: 'PROFESSIONAL',
+    name: KITCHEN_PACKAGE_DETAILS.KITCHEN_PROFESSIONAL.name,
+    description: KITCHEN_PACKAGE_DETAILS.KITCHEN_PROFESSIONAL.description,
+    price: KITCHEN_PACKAGE_DETAILS.KITCHEN_PROFESSIONAL.price,
+    priceLabel: KITCHEN_PACKAGE_DETAILS.KITCHEN_PROFESSIONAL.priceLabel,
+    stripePriceId: KITCHEN_PACKAGE_DETAILS.KITCHEN_PROFESSIONAL.stripePriceId,
+    renders: KITCHEN_PACKAGE_DETAILS.KITCHEN_PROFESSIONAL.units,
+    revisions: typeof KITCHEN_PACKAGE_DETAILS.KITCHEN_PROFESSIONAL.revisions === 'number'
+      ? KITCHEN_PACKAGE_DETAILS.KITCHEN_PROFESSIONAL.revisions : 99,
+    deliveryDays: KITCHEN_PACKAGE_DETAILS.KITCHEN_PROFESSIONAL.deliveryDays,
+    features: KITCHEN_PACKAGE_DETAILS.KITCHEN_PROFESSIONAL.features,
+    popular: true,
+  },
+  PREMIUM: {
+    id: 'PREMIUM',
+    name: KITCHEN_PACKAGE_DETAILS.KITCHEN_PREMIUM.name,
+    description: KITCHEN_PACKAGE_DETAILS.KITCHEN_PREMIUM.description,
+    price: KITCHEN_PACKAGE_DETAILS.KITCHEN_PREMIUM.price,
+    priceLabel: KITCHEN_PACKAGE_DETAILS.KITCHEN_PREMIUM.priceLabel,
+    stripePriceId: KITCHEN_PACKAGE_DETAILS.KITCHEN_PREMIUM.stripePriceId,
+    renders: KITCHEN_PACKAGE_DETAILS.KITCHEN_PREMIUM.units,
+    revisions: typeof KITCHEN_PACKAGE_DETAILS.KITCHEN_PREMIUM.revisions === 'number'
+      ? KITCHEN_PACKAGE_DETAILS.KITCHEN_PREMIUM.revisions : 99,
+    deliveryDays: KITCHEN_PACKAGE_DETAILS.KITCHEN_PREMIUM.deliveryDays,
+    features: KITCHEN_PACKAGE_DETAILS.KITCHEN_PREMIUM.features,
+  },
+}
+
+export function getOneTimePackagesArray(): OneTimePackage[] {
+  return Object.values(ONE_TIME_PACKAGE_DETAILS)
+}
+
+export function getOneTimePriceId(packageType: OneTimePackageType): string | null {
+  return ONE_TIME_PACKAGE_DETAILS[packageType]?.stripePriceId || null
+}
+
+// ============================================
+// SUBSCRIPTION PLANS (kept for future use)
 // ============================================
 
 export const SUBSCRIPTION_PLANS = {
@@ -143,8 +385,8 @@ export interface SubscriptionPlan {
   name: string
   description: string
   monthlyPrice: number
-  yearlyPrice: number // Yearly price (typically discounted)
-  yearlyMonthlyEquivalent: number // What the monthly price works out to when billed yearly
+  yearlyPrice: number
+  yearlyMonthlyEquivalent: number
   stripePriceIdMonthly: string | null
   stripePriceIdYearly: string | null
   projectsPerMonth: number
@@ -154,14 +396,13 @@ export interface SubscriptionPlan {
   popular?: boolean
 }
 
-// Subscription plans for ongoing cabinet visualization services
 export const SUBSCRIPTION_PLAN_DETAILS: Record<SubscriptionPlanType, SubscriptionPlan> = {
   STARTER: {
     id: 'STARTER',
     name: 'Starter',
     description: 'For small businesses getting started',
     monthlyPrice: 149,
-    yearlyPrice: 1490, // ~2 months free
+    yearlyPrice: 1490,
     yearlyMonthlyEquivalent: 124,
     stripePriceIdMonthly: process.env.STRIPE_PRICE_STARTER_MONTHLY || null,
     stripePriceIdYearly: process.env.STRIPE_PRICE_STARTER_YEARLY || null,
@@ -181,7 +422,7 @@ export const SUBSCRIPTION_PLAN_DETAILS: Record<SubscriptionPlanType, Subscriptio
     name: 'Pro',
     description: 'For growing cabinet businesses',
     monthlyPrice: 349,
-    yearlyPrice: 3490, // ~2 months free
+    yearlyPrice: 3490,
     yearlyMonthlyEquivalent: 291,
     stripePriceIdMonthly: process.env.STRIPE_PRICE_PRO_MONTHLY || null,
     stripePriceIdYearly: process.env.STRIPE_PRICE_PRO_YEARLY || null,
@@ -203,7 +444,7 @@ export const SUBSCRIPTION_PLAN_DETAILS: Record<SubscriptionPlanType, Subscriptio
     name: 'Enterprise',
     description: 'For high-volume cabinet makers',
     monthlyPrice: 699,
-    yearlyPrice: 6990, // ~2 months free
+    yearlyPrice: 6990,
     yearlyMonthlyEquivalent: 583,
     stripePriceIdMonthly: process.env.STRIPE_PRICE_ENTERPRISE_MONTHLY || null,
     stripePriceIdYearly: process.env.STRIPE_PRICE_ENTERPRISE_YEARLY || null,
@@ -223,79 +464,42 @@ export const SUBSCRIPTION_PLAN_DETAILS: Record<SubscriptionPlanType, Subscriptio
   },
 }
 
-// ============================================
-// HELPER FUNCTIONS
-// ============================================
-
-/**
- * Get the Stripe price ID for a one-time package
- */
-export function getOneTimePriceId(packageType: OneTimePackageType): string | null {
-  return ONE_TIME_PACKAGE_DETAILS[packageType]?.stripePriceId || null
+export function getSubscriptionPlansArray(): SubscriptionPlan[] {
+  return Object.values(SUBSCRIPTION_PLAN_DETAILS)
 }
 
-/**
- * Get the Stripe price ID for a subscription plan
- */
 export function getSubscriptionPriceId(
   planType: SubscriptionPlanType,
   billingCycle: BillingCycle
 ): string | null {
   const plan = SUBSCRIPTION_PLAN_DETAILS[planType]
   if (!plan) return null
-
-  return billingCycle === 'YEARLY'
-    ? plan.stripePriceIdYearly
-    : plan.stripePriceIdMonthly
+  return billingCycle === 'YEARLY' ? plan.stripePriceIdYearly : plan.stripePriceIdMonthly
 }
 
-/**
- * Get price for a subscription based on billing cycle
- */
 export function getSubscriptionPrice(
   planType: SubscriptionPlanType,
   billingCycle: BillingCycle
 ): number {
   const plan = SUBSCRIPTION_PLAN_DETAILS[planType]
   if (!plan) return 0
-
   return billingCycle === 'YEARLY' ? plan.yearlyPrice : plan.monthlyPrice
 }
 
-/**
- * Calculate yearly savings compared to monthly billing
- */
 export function getYearlySavings(planType: SubscriptionPlanType): number {
   const plan = SUBSCRIPTION_PLAN_DETAILS[planType]
   if (!plan) return 0
-
-  const yearlyIfMonthly = plan.monthlyPrice * 12
-  return yearlyIfMonthly - plan.yearlyPrice
-}
-
-/**
- * Get all one-time packages as an array (for rendering)
- */
-export function getOneTimePackagesArray(): OneTimePackage[] {
-  return Object.values(ONE_TIME_PACKAGE_DETAILS)
-}
-
-/**
- * Get all subscription plans as an array (for rendering)
- */
-export function getSubscriptionPlansArray(): SubscriptionPlan[] {
-  return Object.values(SUBSCRIPTION_PLAN_DETAILS)
+  return plan.monthlyPrice * 12 - plan.yearlyPrice
 }
 
 // ============================================
-// LEGACY EXPORTS (for backwards compatibility)
+// LEGACY PACKAGE EXPORTS
 // ============================================
 
-// Map old PACKAGES to new structure
 export const PACKAGES = {
   BASIC: 'BASIC',
   PROFESSIONAL: 'PROFESSIONAL',
-  PARTNER: 'PRO', // Map old PARTNER to new PRO
+  PARTNER: 'PRO',
 } as const
 
 export type PackageType = (typeof PACKAGES)[keyof typeof PACKAGES]
@@ -303,7 +507,12 @@ export type PackageType = (typeof PACKAGES)[keyof typeof PACKAGES]
 export const PACKAGE_PRICES: Record<string, number> = {
   BASIC: 79,
   PROFESSIONAL: 199,
-  PARTNER: 349, // Now maps to PRO subscription
+  PREMIUM: 499,
+  PARTNER: 349,
+  // Wardrobe prices
+  WARDROBE_SINGLE_WALL: 20,
+  WARDROBE_MULTI_WALL: 40,
+  WARDROBE_BULK: 10,
 }
 
 export const PACKAGE_FEATURES = {

@@ -123,9 +123,9 @@ const defaultSettings = [
   { key: 'pricing_section_title', value: 'Choose Your Package', category: 'PRICING', label: 'Section Title', type: 'TEXT', description: 'Main section title' },
   { key: 'pricing_section_description', value: 'Transparent pricing with no hidden fees. Pay per project or save with a monthly retainer.', category: 'PRICING', label: 'Section Description', type: 'TEXTAREA', description: 'Paragraph under title' },
   { key: 'pricing_packages', value: JSON.stringify([
-    { name: 'Basic', subtitle: 'Perfect for simple jobs', price: '$99', period: '/project', featured: false, features: ['Single room/unit design', '2 photorealistic renders', 'Basic 2D drawing', '1 revision round', '72-hour delivery'] },
-    { name: 'Professional', subtitle: 'Best for client presentations', price: '$199', period: '/project', featured: true, features: ['Complete room design', '5 photorealistic renders', 'Detailed technical drawings', '3 revision rounds', '48-hour delivery', 'Material options included'] },
-    { name: 'Partner', subtitle: 'For regular workflow', price: '$499', period: '/month', featured: false, features: ['Up to 5 projects/month', 'Unlimited renders per project', 'Full technical package', 'Unlimited revisions', '24-hour priority delivery', 'Dedicated support line'] }
+    { name: 'Kitchen Basic', subtitle: '1 Kitchen visualization', price: '$79', period: '', featured: false, features: ['1 Kitchen visualization', '2D Elevation views', '2D Top view', '3D View', '1 revision round', '5 business day delivery'] },
+    { name: 'Kitchen Professional', subtitle: 'Best value for contractors', price: '$199', period: '', featured: true, features: ['4 Kitchen visualizations', '2D Elevation views', '2D Top view', '3D View', '2 revision rounds', 'Priority support', '3 business day delivery'] },
+    { name: 'Kitchen Premium', subtitle: 'For builders & designers', price: '$499', period: '', featured: false, features: ['10 Kitchen visualizations', '2D Elevation views', '2D Top view', '3D View', 'Unlimited revisions', 'Priority delivery', 'Dedicated project manager', '2 business day delivery'] }
   ]), category: 'PRICING', label: 'Pricing Packages', type: 'JSON', description: 'Pricing cards configuration' },
 
   // ============================================

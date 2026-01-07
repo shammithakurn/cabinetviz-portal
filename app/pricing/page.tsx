@@ -8,7 +8,8 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { getCurrentUser } from '@/lib/auth'
 import {
-  getOneTimePackagesArray,
+  getKitchenPackagesArray,
+  getWardrobePackagesArray,
   getSubscriptionPlansArray,
   formatPrice,
   getYearlySavings,
@@ -22,7 +23,8 @@ export const metadata: Metadata = {
 
 export default async function PricingPage() {
   const user = await getCurrentUser()
-  const oneTimePackages = getOneTimePackagesArray()
+  const kitchenPackages = getKitchenPackagesArray()
+  const wardrobePackages = getWardrobePackagesArray()
   const subscriptionPlans = getSubscriptionPlansArray()
 
   // Calculate savings for each subscription plan
@@ -82,7 +84,8 @@ export default async function PricingPage() {
       {/* Pricing Content */}
       <section className="px-[4%] pb-20">
         <PricingTabs
-          oneTimePackages={oneTimePackages}
+          kitchenPackages={kitchenPackages}
+          wardrobePackages={wardrobePackages}
           subscriptionPlans={plansWithSavings}
           isLoggedIn={!!user}
         />

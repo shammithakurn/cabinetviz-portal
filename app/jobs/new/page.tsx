@@ -56,7 +56,7 @@ export default function NewJobPage() {
     projectType: '',
     roomType: '',
     priority: 'NORMAL',
-    package: 'PROFESSIONAL',
+    package: 'KITCHEN_PROFESSIONAL',
     roomWidth: '',
     roomLength: '',
     roomHeight: '',
@@ -334,10 +334,19 @@ export default function NewJobPage() {
                     value={formData.package}
                     onChange={(e) => updateField('package', e.target.value)}
                   >
-                    <option value="BASIC">Kitchen Basic - 1 Kitchen ($79)</option>
-                    <option value="PROFESSIONAL">Kitchen Professional - 4 Kitchens ($199)</option>
-                    <option value="PREMIUM">Kitchen Premium - 10 Kitchens ($499)</option>
-                    <option value="PARTNER">Partner (Subscription)</option>
+                    <optgroup label="Kitchen Packages">
+                      <option value="KITCHEN_BASIC">Kitchen Basic - 1 Kitchen ($79)</option>
+                      <option value="KITCHEN_PROFESSIONAL">Kitchen Professional - 4 Kitchens ($199)</option>
+                      <option value="KITCHEN_PREMIUM">Kitchen Premium - 10 Kitchens ($499)</option>
+                    </optgroup>
+                    <optgroup label="Wardrobe Packages">
+                      <option value="WARDROBE_SINGLE_WALL">Single Wall Wardrobe ($20)</option>
+                      <option value="WARDROBE_MULTI_WALL">Multi Wall Wardrobe ($40)</option>
+                      <option value="WARDROBE_BULK">Bulk Wardrobes - 5+ ($10/each)</option>
+                    </optgroup>
+                    <optgroup label="Subscriptions">
+                      <option value="PARTNER">Partner (Subscription)</option>
+                    </optgroup>
                   </select>
                 </div>
               </div>
