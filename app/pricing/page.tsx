@@ -34,9 +34,9 @@ export default async function PricingPage() {
   }))
 
   return (
-    <div className="min-h-screen bg-dark-bg">
+    <div className="min-h-screen bg-warm-white">
       {/* Navigation */}
-      <nav className="px-[4%] py-5 flex justify-between items-center bg-dark-surface/95 backdrop-blur-xl border-b border-dark-elevated">
+      <nav className="px-[4%] py-5 flex justify-between items-center bg-warm-white/95 backdrop-blur-xl border-b border-border">
         <Link href="/" className="flex items-center gap-2">
           <div className="w-8 h-8 bg-walnut rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-sm">CV</span>
@@ -143,7 +143,7 @@ export default async function PricingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="px-[4%] py-8 border-t border-dark-elevated text-center text-sm text-text-muted">
+      <footer className="px-[4%] py-8 border-t border-border text-center text-sm text-text-muted">
         <p>&copy; {new Date().getFullYear()} CabinetViz. All rights reserved.</p>
         <div className="flex justify-center gap-4 mt-2">
           <Link href="/privacy" className="hover:text-walnut">Privacy Policy</Link>
