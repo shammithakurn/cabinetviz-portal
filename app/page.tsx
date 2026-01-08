@@ -11,7 +11,15 @@ import { getThemeSettings, parseJsonSetting } from '@/lib/theme'
 import { FestivalWrapper } from '@/components/festival'
 import ScrollToTop from '@/components/ui/ScrollToTop'
 import DiscountBanner from '@/components/DiscountBanner'
+import { HomePricingTabs } from '@/components/HomePricingTabs'
 import { prisma } from '@/lib/db'
+
+// Static wardrobe packages (not in theme settings)
+const WARDROBE_PACKAGES = [
+  { name: 'Single Wall', subtitle: '1 Wardrobe visualization', price: '$20', period: '', featured: false, features: ['1 Wardrobe visualization', '2D Elevation views', '2D Top view', '3D View', '1 revision round', '5 business day delivery'] },
+  { name: 'Multi Wall', subtitle: 'Complex wardrobe layouts', price: '$40', period: '', featured: true, features: ['1 Multi-wall wardrobe', '2D Elevation views', '2D Top view', '3D View', '2 revision rounds', '3 business day delivery'] },
+  { name: 'Bulk Wardrobes', subtitle: '5+ wardrobes at $10 each', price: '$10', period: '/each', featured: false, features: ['Minimum 5 wardrobes', '2D Elevation views', '2D Top view', '3D View', 'Volume discount', 'Priority support'] },
+]
 
 async function signOut() {
   'use server'
@@ -307,11 +315,10 @@ export default async function HomePage() {
             {theme.pricing_section_description}
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto relative z-10">
-          {pricingPackages.map((pkg, i) => (
-            <PricingCard key={i} name={pkg.name} subtitle={pkg.subtitle} price={pkg.price} period={pkg.period} features={pkg.features} featured={pkg.featured} />
-          ))}
-        </div>
+        <HomePricingTabs
+          kitchenPackages={pricingPackages}
+          wardrobePackages={WARDROBE_PACKAGES}
+        />
       </section>
 
       {/* Process Section */}
