@@ -38,13 +38,14 @@ export function PricingTabs({
     router.push(`/checkout?type=one_time&package=${packageId}`)
   }
 
-  const handleSelectPlan = (planId: string) => {
-    if (!isLoggedIn) {
-      router.push(`/auth/login?redirect=/checkout?type=subscription&plan=${planId}&billing=${billingCycle}`)
-      return
-    }
-    router.push(`/checkout?type=subscription&plan=${planId}&billing=${billingCycle}`)
-  }
+  // Subscription handler hidden for now - can be re-enabled later
+  // const handleSelectPlan = (planId: string) => {
+  //   if (!isLoggedIn) {
+  //     router.push(`/auth/login?redirect=/checkout?type=subscription&plan=${planId}&billing=${billingCycle}`)
+  //     return
+  //   }
+  //   router.push(`/checkout?type=subscription&plan=${planId}&billing=${billingCycle}`)
+  // }
 
   const renderPackageCard = (pkg: Package) => (
     <div
