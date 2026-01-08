@@ -70,8 +70,19 @@ export default async function PricingPage() {
         </div>
       </nav>
 
+      {/* Back to Home */}
+      <div className="px-[4%] pt-8">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-text-light hover:text-walnut transition-colors"
+        >
+          <span>←</span>
+          <span>Back to Home</span>
+        </Link>
+      </div>
+
       {/* Header */}
-      <section className="px-[4%] py-16 text-center">
+      <section className="px-[4%] py-12 text-center">
         <h1 className="text-4xl md:text-5xl font-display font-bold text-charcoal mb-4">
           Simple, Transparent Pricing
         </h1>
