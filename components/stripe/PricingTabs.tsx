@@ -25,8 +25,9 @@ export function PricingTabs({
   subscriptionPlans,
   isLoggedIn,
 }: PricingTabsProps) {
-  const [activeTab, setActiveTab] = useState<'kitchen' | 'wardrobe' | 'subscription'>('kitchen')
-  const [billingCycle, setBillingCycle] = useState<'MONTHLY' | 'YEARLY'>('MONTHLY')
+  const [activeTab, setActiveTab] = useState<'kitchen' | 'wardrobe'>('kitchen')
+  // Subscription features hidden for now - can be re-enabled later
+  // const [billingCycle, setBillingCycle] = useState<'MONTHLY' | 'YEARLY'>('MONTHLY')
   const router = useRouter()
 
   const handleSelectPackage = (packageId: string) => {
@@ -154,6 +155,7 @@ export function PricingTabs({
           >
             <span>👔</span> Wardrobe
           </button>
+          {/* Subscription tab hidden for now - can be re-enabled later
           <button
             onClick={() => setActiveTab('subscription')}
             className={`px-6 py-2.5 rounded-lg font-medium transition-all flex items-center gap-2 ${
@@ -164,6 +166,7 @@ export function PricingTabs({
           >
             <span>📦</span> Subscriptions
           </button>
+          */}
         </div>
       </div>
 
@@ -181,7 +184,7 @@ export function PricingTabs({
         </div>
       )}
 
-      {/* Billing Cycle Toggle (for subscriptions) */}
+      {/* Subscription section hidden for now - can be re-enabled later
       {activeTab === 'subscription' && (
         <>
           <div className="flex justify-center mb-8">
@@ -210,7 +213,6 @@ export function PricingTabs({
             </div>
           </div>
 
-          {/* Subscription Plans */}
           <div className="grid md:grid-cols-3 gap-8">
             {subscriptionPlans.map((plan) => (
               <div
@@ -304,6 +306,7 @@ export function PricingTabs({
           </div>
         </>
       )}
+      */}
 
       {/* Money-back guarantee */}
       <div className="mt-10 text-center">
