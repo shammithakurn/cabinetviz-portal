@@ -34,20 +34,20 @@ export default async function PricingPage() {
   }))
 
   return (
-    <div className="min-h-screen bg-warm-white">
+    <div className="min-h-screen bg-dark-bg">
       {/* Navigation */}
-      <nav className="px-[4%] py-5 flex justify-between items-center bg-warm-white/95 backdrop-blur-xl border-b border-border">
+      <nav className="px-[4%] py-5 flex justify-between items-center bg-dark-surface/95 backdrop-blur-xl border-b border-dark-elevated">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center">
-            <span className="text-warm-white font-bold text-sm">CV</span>
+          <div className="w-8 h-8 bg-walnut rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-sm">CV</span>
           </div>
-          <span className="font-display text-xl font-semibold text-brand-600">CabinetViz</span>
+          <span className="font-display text-xl font-semibold text-walnut">CabinetViz</span>
         </Link>
         <div className="flex items-center gap-4">
           {user ? (
             <Link
               href="/dashboard"
-              className="px-5 py-2.5 bg-brand-600 text-warm-white rounded-lg font-medium hover:bg-brand-700 transition-colors"
+              className="px-5 py-2.5 bg-walnut text-white rounded-lg font-medium hover:bg-walnut-dark transition-colors"
             >
               Dashboard
             </Link>
@@ -55,13 +55,13 @@ export default async function PricingPage() {
             <>
               <Link
                 href="/auth/login"
-                className="px-4 py-2 text-brand-600 font-medium hover:text-brand-700 transition-colors"
+                className="px-4 py-2 text-walnut font-medium hover:text-accent transition-colors"
               >
                 Sign In
               </Link>
               <Link
                 href="/auth/register"
-                className="px-5 py-2.5 bg-brand-600 text-warm-white rounded-lg font-medium hover:bg-brand-700 transition-colors"
+                className="px-5 py-2.5 bg-walnut text-white rounded-lg font-medium hover:bg-walnut-dark transition-colors"
               >
                 Get Started
               </Link>
@@ -72,10 +72,10 @@ export default async function PricingPage() {
 
       {/* Header */}
       <section className="px-[4%] py-16 text-center">
-        <h1 className="text-4xl md:text-5xl font-display font-bold text-brand-700 mb-4">
+        <h1 className="text-4xl md:text-5xl font-display font-bold text-charcoal mb-4">
           Simple, Transparent Pricing
         </h1>
-        <p className="text-lg text-muted max-w-2xl mx-auto">
+        <p className="text-lg text-text-light max-w-2xl mx-auto">
           Choose a one-time package for individual projects or subscribe for ongoing savings.
           All prices in NZD. International payments accepted.
         </p>
@@ -92,9 +92,9 @@ export default async function PricingPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="px-[4%] py-16 bg-soft-cream">
+      <section className="px-[4%] py-16 bg-dark-surface">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl font-display font-bold text-brand-700 text-center mb-10">
+          <h2 className="text-3xl font-display font-bold text-charcoal text-center mb-10">
             Frequently Asked Questions
           </h2>
           <div className="space-y-6">
@@ -128,26 +128,26 @@ export default async function PricingPage() {
 
       {/* CTA Section */}
       <section className="px-[4%] py-16 text-center">
-        <h2 className="text-2xl font-display font-bold text-brand-700 mb-4">
+        <h2 className="text-2xl font-display font-bold text-charcoal mb-4">
           Still have questions?
         </h2>
-        <p className="text-muted mb-6">
+        <p className="text-text-light mb-6">
           Our team is here to help you choose the right plan for your needs.
         </p>
         <Link
           href="/contact"
-          className="inline-block px-6 py-3 border-2 border-brand-600 text-brand-600 rounded-lg font-medium hover:bg-brand-600 hover:text-warm-white transition-colors"
+          className="inline-block px-6 py-3 border-2 border-walnut text-walnut rounded-lg font-medium hover:bg-walnut hover:text-white transition-colors"
         >
           Contact Us
         </Link>
       </section>
 
       {/* Footer */}
-      <footer className="px-[4%] py-8 border-t border-border text-center text-sm text-muted">
+      <footer className="px-[4%] py-8 border-t border-dark-elevated text-center text-sm text-text-muted">
         <p>&copy; {new Date().getFullYear()} CabinetViz. All rights reserved.</p>
         <div className="flex justify-center gap-4 mt-2">
-          <Link href="/privacy" className="hover:text-brand-600">Privacy Policy</Link>
-          <Link href="/terms" className="hover:text-brand-600">Terms of Service</Link>
+          <Link href="/privacy" className="hover:text-walnut">Privacy Policy</Link>
+          <Link href="/terms" className="hover:text-walnut">Terms of Service</Link>
         </div>
       </footer>
     </div>
@@ -156,16 +156,16 @@ export default async function PricingPage() {
 
 function FAQItem({ question, answer }: { question: string; answer: string }) {
   return (
-    <details className="group bg-warm-white rounded-xl p-6 border border-border">
+    <details className="group bg-dark-elevated rounded-xl p-6 border border-dark-surface">
       <summary className="flex justify-between items-center cursor-pointer list-none">
-        <span className="font-medium text-brand-700">{question}</span>
-        <span className="ml-4 text-brand-600 group-open:rotate-180 transition-transform">
+        <span className="font-medium text-charcoal">{question}</span>
+        <span className="ml-4 text-walnut group-open:rotate-180 transition-transform">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </span>
       </summary>
-      <p className="mt-4 text-muted">{answer}</p>
+      <p className="mt-4 text-text-light">{answer}</p>
     </details>
   )
 }
