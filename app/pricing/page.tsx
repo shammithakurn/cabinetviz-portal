@@ -134,12 +134,12 @@ export default async function PricingPage() {
         <p className="text-text-light mb-6">
           Our team is here to help you choose the right plan for your needs.
         </p>
-        <Link
-          href="/contact"
+        <a
+          href="mailto:hello@cabinetviz.com"
           className="inline-block px-6 py-3 border-2 border-walnut text-walnut rounded-lg font-medium hover:bg-walnut hover:text-white transition-colors"
         >
           Contact Us
-        </Link>
+        </a>
       </section>
 
       {/* Footer */}
