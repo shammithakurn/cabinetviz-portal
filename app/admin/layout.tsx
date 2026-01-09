@@ -9,7 +9,7 @@ import { prisma } from '@/lib/db'
 async function signOut() {
   'use server'
   await removeAuthCookie()
-  redirect('/auth/login')
+  redirect('/auth/logout')
 }
 
 export default async function AdminLayout({

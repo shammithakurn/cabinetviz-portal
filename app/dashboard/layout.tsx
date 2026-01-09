@@ -8,7 +8,7 @@ import { getCurrentUser, removeAuthCookie } from '@/lib/auth'
 async function signOut() {
   'use server'
   await removeAuthCookie()
-  redirect('/auth/login')
+  redirect('/auth/logout')
 }
 
 export default async function DashboardLayout({

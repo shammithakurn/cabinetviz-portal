@@ -73,8 +73,8 @@ export const authConfig = {
         return true
       }
 
-      // Redirect logged in users away from auth pages (but not error page)
-      if (pathname.startsWith('/auth') && !pathname.startsWith('/auth/error')) {
+      // Redirect logged in users away from auth pages (but not error or logout page)
+      if (pathname.startsWith('/auth') && !pathname.startsWith('/auth/error') && !pathname.startsWith('/auth/logout')) {
         if (isLoggedIn) {
           return Response.redirect(new URL('/dashboard', request.nextUrl))
         }

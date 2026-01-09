@@ -135,5 +135,12 @@ export async function setAuthCookie(token: string) {
 }
 
 export async function removeAuthCookie() {
-  cookies().delete('auth-token')
+  const cookieStore = cookies()
+  // Clear legacy auth token
+  cookieStore.delete('auth-token')
+  // Clear NextAuth session cookies
+  cookieStore.delete('authjs.session-token')
+  cookieStore.delete('__Secure-authjs.session-token')
+  cookieStore.delete('authjs.callback-url')
+  cookieStore.delete('authjs.csrf-token')
 }
