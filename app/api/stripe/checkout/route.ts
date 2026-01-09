@@ -88,9 +88,14 @@ export async function POST(request: NextRequest) {
 
       // Get package details
       const pkg = ALL_PACKAGE_DETAILS[packageId]
+
+      // Debug: Log the package and price ID status
+      console.log('Package lookup:', packageId, 'Found:', !!pkg, 'PriceId:', pkg?.stripePriceId || 'MISSING')
+
       if (!pkg.stripePriceId) {
+        console.error(`Missing Stripe Price ID for package: ${packageId}. Check STRIPE_PRICE_* env vars.`)
         return NextResponse.json(
-          { error: 'This package is not yet available for purchase. Please contact support.' },
+          { error: `This package is not yet available for purchase. Please contact support. (Missing price config for ${packageId})` },
           { status: 400 }
         )
       }
@@ -178,6 +183,11 @@ export async function POST(request: NextRequest) {
     )
   } catch (error) {
     console.error('Checkout session creation error:', error)
+    console.error('Error details:', {
+      name: error instanceof Error ? error.name : 'Unknown',
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    })
 
     // Check for specific Stripe errors
     if (error instanceof Error) {
@@ -185,6 +195,14 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           { error: 'This product is not yet available for purchase. Please contact support.' },
           { status: 400 }
+        )
+      }
+
+      // Check for Stripe API errors
+      if (error.message.includes('Stripe')) {
+        return NextResponse.json(
+          { error: `Stripe error: ${error.message}` },
+          { status: 500 }
         )
       }
     }
