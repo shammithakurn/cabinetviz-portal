@@ -2,7 +2,7 @@
 // Client-side utilities for MYOB payment integration
 // Safe to use in client components - no secret credentials
 
-import type { OneTimePackageType, SubscriptionPlanType, BillingCycle } from '@/lib/constants/pricing'
+import type { SubscriptionPlanType, BillingCycle } from '@/lib/constants/pricing'
 
 // ============================================
 // TYPES
@@ -36,9 +36,10 @@ export interface MYOBAuthStatusResponse {
 
 /**
  * Create an invoice for a one-time package purchase
+ * Supports new package IDs like KITCHEN_BASIC, WARDROBE_SINGLE_WALL
  */
 export async function createOneTimeInvoice(
-  packageType: OneTimePackageType,
+  packageId: string,
   jobId?: string
 ): Promise<CreateInvoiceResponse> {
   try {
@@ -49,7 +50,7 @@ export async function createOneTimeInvoice(
       },
       body: JSON.stringify({
         type: 'one_time',
-        packageType,
+        packageId,
         jobId,
       }),
     })

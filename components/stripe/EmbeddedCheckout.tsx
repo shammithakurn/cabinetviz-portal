@@ -14,7 +14,7 @@ import { createOneTimeCheckout, createSubscriptionCheckout } from '@/lib/stripe-
 
 interface EmbeddedCheckoutFormProps {
   type: 'one_time' | 'subscription'
-  packageType?: 'BASIC' | 'PROFESSIONAL' | 'PREMIUM'
+  packageId?: string // Package ID like KITCHEN_BASIC, WARDROBE_SINGLE_WALL
   planType?: 'STARTER' | 'PRO' | 'ENTERPRISE'
   billingCycle?: 'MONTHLY' | 'YEARLY'
   jobId?: string
@@ -22,7 +22,7 @@ interface EmbeddedCheckoutFormProps {
 
 export function EmbeddedCheckoutForm({
   type,
-  packageType,
+  packageId,
   planType,
   billingCycle = 'MONTHLY',
   jobId,
@@ -39,8 +39,8 @@ export function EmbeddedCheckoutForm({
 
       let response
 
-      if (type === 'one_time' && packageType) {
-        response = await createOneTimeCheckout(packageType, jobId)
+      if (type === 'one_time' && packageId) {
+        response = await createOneTimeCheckout(packageId, jobId)
       } else if (type === 'subscription' && planType) {
         response = await createSubscriptionCheckout(planType, billingCycle)
       } else {
@@ -54,7 +54,7 @@ export function EmbeddedCheckoutForm({
     } finally {
       setLoading(false)
     }
-  }, [type, packageType, planType, billingCycle, jobId])
+  }, [type, packageId, planType, billingCycle, jobId])
 
   useEffect(() => {
     fetchClientSecret()

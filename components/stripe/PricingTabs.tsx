@@ -31,11 +31,16 @@ export function PricingTabs({
   const router = useRouter()
 
   const handleSelectPackage = (packageId: string) => {
+    console.log('Package selected:', packageId, 'isLoggedIn:', isLoggedIn)
     if (!isLoggedIn) {
-      router.push(`/auth/login?redirect=/checkout?type=one_time&package=${packageId}`)
+      const redirectUrl = `/auth/login?redirect=/checkout?type=one_time&package=${packageId}`
+      console.log('Redirecting to:', redirectUrl)
+      router.push(redirectUrl)
       return
     }
-    router.push(`/checkout?type=one_time&package=${packageId}`)
+    const checkoutUrl = `/checkout?type=one_time&package=${packageId}`
+    console.log('Redirecting to checkout:', checkoutUrl)
+    router.push(checkoutUrl)
   }
 
   // Subscription handler hidden for now - can be re-enabled later

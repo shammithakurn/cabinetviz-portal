@@ -9,7 +9,7 @@ import { MYOBCheckout } from '@/components/myob'
 
 interface CheckoutClientProps {
   type: 'one_time' | 'subscription'
-  packageType?: 'BASIC' | 'PROFESSIONAL' | 'PREMIUM'
+  packageId?: string // New: Package ID like KITCHEN_BASIC, WARDROBE_SINGLE_WALL
   planType?: 'STARTER' | 'PRO' | 'ENTERPRISE'
   billingCycle: 'MONTHLY' | 'YEARLY'
   jobId?: string
@@ -20,7 +20,7 @@ interface CheckoutClientProps {
 
 export function CheckoutClient({
   type,
-  packageType,
+  packageId,
   planType,
   billingCycle,
   jobId,
@@ -77,7 +77,7 @@ export function CheckoutClient({
     return (
       <MYOBCheckout
         type={type}
-        packageType={packageType}
+        packageId={packageId}
         planType={planType}
         billingCycle={billingCycle}
         jobId={jobId}
@@ -91,7 +91,7 @@ export function CheckoutClient({
   return (
     <EmbeddedCheckoutForm
       type={type}
-      packageType={packageType}
+      packageId={packageId}
       planType={planType}
       billingCycle={billingCycle}
       jobId={jobId}

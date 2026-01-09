@@ -8,14 +8,24 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getCurrentUser } from '@/lib/auth'
 import {
-  ONE_TIME_PACKAGE_DETAILS,
+  ALL_PACKAGE_DETAILS,
   SUBSCRIPTION_PLAN_DETAILS,
   formatPrice,
-  type OneTimePackageType,
+  type AllPackageType,
   type SubscriptionPlanType,
   type BillingCycle,
 } from '@/lib/constants/pricing'
 import { CheckoutClient } from './CheckoutClient'
+
+// Valid package IDs for all Kitchen and Wardrobe packages
+const VALID_PACKAGE_IDS = [
+  'KITCHEN_BASIC',
+  'KITCHEN_PROFESSIONAL',
+  'KITCHEN_PREMIUM',
+  'WARDROBE_SINGLE_WALL',
+  'WARDROBE_MULTI_WALL',
+  'WARDROBE_BULK',
+]
 
 interface CheckoutPageProps {
   searchParams: {
@@ -35,7 +45,7 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
     redirect(`/auth/login?redirect=/checkout?${redirectUrl}`)
   }
 
-  const { type, package: packageType, plan: planType, billing, job: jobId } = searchParams
+  const { type, package: packageId, plan: planType, billing, job: jobId } = searchParams
 
   // Validate checkout type
   if (!type || !['one_time', 'subscription'].includes(type)) {
@@ -44,7 +54,7 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
 
   // Validate one-time package
   if (type === 'one_time') {
-    if (!packageType || !['BASIC', 'PROFESSIONAL', 'PREMIUM'].includes(packageType)) {
+    if (!packageId || !VALID_PACKAGE_IDS.includes(packageId)) {
       redirect('/pricing')
     }
   }
@@ -64,8 +74,8 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
   let productPrice = 0
   let priceLabel = ''
 
-  if (type === 'one_time' && packageType) {
-    const pkg = ONE_TIME_PACKAGE_DETAILS[packageType as OneTimePackageType]
+  if (type === 'one_time' && packageId) {
+    const pkg = ALL_PACKAGE_DETAILS[packageId as AllPackageType]
     productName = `${pkg.name} Package`
     productDescription = pkg.description
     productPrice = pkg.price
@@ -169,7 +179,7 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
 
               <CheckoutClient
                 type={type as 'one_time' | 'subscription'}
-                packageType={packageType as 'BASIC' | 'PROFESSIONAL' | 'PREMIUM' | undefined}
+                packageId={packageId}
                 planType={planType as 'STARTER' | 'PRO' | 'ENTERPRISE' | undefined}
                 billingCycle={billingCycle}
                 jobId={jobId}

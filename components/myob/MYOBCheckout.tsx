@@ -6,11 +6,11 @@
 
 import { useState, useCallback } from 'react'
 import { createOneTimeInvoice, createSubscriptionInvoice, openPaymentPage } from '@/lib/myob-client'
-import type { OneTimePackageType, SubscriptionPlanType, BillingCycle } from '@/lib/constants/pricing'
+import type { SubscriptionPlanType, BillingCycle } from '@/lib/constants/pricing'
 
 interface MYOBCheckoutProps {
   type: 'one_time' | 'subscription'
-  packageType?: OneTimePackageType
+  packageId?: string // Package ID like KITCHEN_BASIC, WARDROBE_SINGLE_WALL
   planType?: SubscriptionPlanType
   billingCycle: BillingCycle
   jobId?: string
@@ -22,7 +22,7 @@ type CheckoutState = 'idle' | 'creating' | 'ready' | 'error'
 
 export function MYOBCheckout({
   type,
-  packageType,
+  packageId,
   planType,
   billingCycle,
   jobId,
@@ -43,8 +43,8 @@ export function MYOBCheckout({
     try {
       let result
 
-      if (type === 'one_time' && packageType) {
-        result = await createOneTimeInvoice(packageType, jobId)
+      if (type === 'one_time' && packageId) {
+        result = await createOneTimeInvoice(packageId, jobId)
       } else if (type === 'subscription' && planType) {
         result = await createSubscriptionInvoice(planType, billingCycle)
       } else {
@@ -64,7 +64,7 @@ export function MYOBCheckout({
       setError(err instanceof Error ? err.message : 'An error occurred')
       setState('error')
     }
-  }, [type, packageType, planType, billingCycle, jobId])
+  }, [type, packageId, planType, billingCycle, jobId])
 
   const handlePayNow = () => {
     if (invoiceDetails?.paymentUrl) {

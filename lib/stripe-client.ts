@@ -45,9 +45,10 @@ interface CheckoutError {
 
 /**
  * Create a checkout session for a one-time package purchase
+ * Supports new package IDs like KITCHEN_BASIC, WARDROBE_SINGLE_WALL
  */
 export async function createOneTimeCheckout(
-  packageType: 'BASIC' | 'PROFESSIONAL' | 'PREMIUM',
+  packageId: string,
   jobId?: string
 ): Promise<CreateCheckoutResponse> {
   const response = await fetch('/api/stripe/checkout', {
@@ -57,7 +58,7 @@ export async function createOneTimeCheckout(
     },
     body: JSON.stringify({
       mode: 'one_time',
-      packageType,
+      packageId,
       jobId,
     }),
   })

@@ -6,18 +6,15 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth'
+import { createCheckoutSession } from '@/lib/stripe'
 import {
-  createOneTimeCheckoutSession,
-  createSubscriptionCheckoutSession,
-} from '@/lib/stripe'
-import {
-  ONE_TIME_PACKAGES,
-  ONE_TIME_PACKAGE_DETAILS,
+  ALL_PACKAGE_DETAILS,
   SUBSCRIPTION_PLANS,
   BILLING_CYCLES,
-  type OneTimePackageType,
+  type AllPackageType,
   type SubscriptionPlanType,
   type BillingCycle,
+  getSubscriptionPriceId,
 } from '@/lib/constants/pricing'
 
 // ============================================
@@ -26,7 +23,7 @@ import {
 
 interface OneTimeCheckoutRequest {
   mode: 'one_time'
-  packageType: OneTimePackageType
+  packageId: string // Package ID like KITCHEN_BASIC, WARDROBE_SINGLE_WALL
   jobId?: string
 }
 
@@ -38,10 +35,8 @@ interface SubscriptionCheckoutRequest {
 
 type CheckoutRequest = OneTimeCheckoutRequest | SubscriptionCheckoutRequest
 
-function isValidOneTimePackage(value: string): value is OneTimePackageType {
-  // Check if it's a valid key (BASIC, PROFESSIONAL, PREMIUM)
-  return Object.keys(ONE_TIME_PACKAGES).includes(value) ||
-    Object.keys(ONE_TIME_PACKAGE_DETAILS).includes(value)
+function isValidPackageId(value: string): value is AllPackageType {
+  return Object.keys(ALL_PACKAGE_DETAILS).includes(value)
 }
 
 function isValidSubscriptionPlan(value: string): value is SubscriptionPlanType {
@@ -78,31 +73,50 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
     // 3. Handle one-time payment checkout
     if (body.mode === 'one_time') {
-      const { packageType, jobId } = body as OneTimeCheckoutRequest
+      const { packageId, jobId } = body as OneTimeCheckoutRequest
 
-      if (!packageType || !isValidOneTimePackage(packageType)) {
+      if (!packageId || !isValidPackageId(packageId)) {
         return NextResponse.json(
-          { error: 'Invalid package type. Must be BASIC, PROFESSIONAL, or PREMIUM' },
+          { error: 'Invalid package ID. Must be a valid Kitchen or Wardrobe package.' },
+          { status: 400 }
+        )
+      }
+
+      // Get package details
+      const pkg = ALL_PACKAGE_DETAILS[packageId]
+      if (!pkg.stripePriceId) {
+        return NextResponse.json(
+          { error: 'This package is not yet available for purchase. Please contact support.' },
           { status: 400 }
         )
       }
 
       // Create checkout session for one-time payment
-      const { sessionId, clientSecret } = await createOneTimeCheckoutSession(
-        user.id,
-        user.email,
-        user.name || undefined,
-        packageType,
-        jobId
-      )
+      const { sessionId, clientSecret } = await createCheckoutSession({
+        userId: user.id,
+        userEmail: user.email,
+        userName: user.name || undefined,
+        priceId: pkg.stripePriceId,
+        mode: 'payment',
+        successUrl: `${baseUrl}/checkout/success`,
+        cancelUrl: `${baseUrl}/pricing`,
+        metadata: {
+          type: 'one_time',
+          packageId,
+          category: pkg.category,
+        },
+        jobId,
+      })
 
       return NextResponse.json({
         sessionId,
         clientSecret,
         mode: 'one_time',
-        packageType,
+        packageId,
       })
     }
 
@@ -124,14 +138,30 @@ export async function POST(request: NextRequest) {
         )
       }
 
+      // Get subscription price ID
+      const priceId = getSubscriptionPriceId(planType, billingCycle)
+      if (!priceId) {
+        return NextResponse.json(
+          { error: 'This subscription plan is not yet available. Please contact support.' },
+          { status: 400 }
+        )
+      }
+
       // Create checkout session for subscription
-      const { sessionId, clientSecret } = await createSubscriptionCheckoutSession(
-        user.id,
-        user.email,
-        user.name || undefined,
-        planType,
-        billingCycle
-      )
+      const { sessionId, clientSecret } = await createCheckoutSession({
+        userId: user.id,
+        userEmail: user.email,
+        userName: user.name || undefined,
+        priceId,
+        mode: 'subscription',
+        successUrl: `${baseUrl}/checkout/success`,
+        cancelUrl: `${baseUrl}/pricing`,
+        metadata: {
+          type: 'subscription',
+          planType,
+          billingCycle,
+        },
+      })
 
       return NextResponse.json({
         sessionId,
