@@ -63,6 +63,17 @@ export const authConfig = {
         return isLoggedIn // Will redirect to signIn page if false
       }
 
+      // Checkout routes - allow success page even if not logged in (payment may have cleared session)
+      // The checkout page itself will redirect to login if needed
+      if (pathname.startsWith('/checkout')) {
+        // Allow access to success page always (session might be lost after Stripe redirect)
+        if (pathname.includes('/success')) {
+          return true
+        }
+        // Protect checkout page itself
+        return isLoggedIn
+      }
+
       // Protect admin routes
       if (pathname.startsWith('/admin')) {
         if (!isLoggedIn) return false

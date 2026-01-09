@@ -166,31 +166,20 @@ export function SuccessContent({
 
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
-        {isLoggedIn ? (
-          <>
-            <Link
-              href={isSubscription ? '/jobs/new' : '/dashboard'}
-              className="px-6 py-3 bg-brand-600 text-warm-white rounded-xl font-medium hover:bg-brand-700 transition-colors"
-            >
-              {isSubscription ? 'Create Your First Project' : 'Go to Dashboard'}
-            </Link>
-            {isSubscription && (
-              <button
-                onClick={handleManageSubscription}
-                disabled={loadingPortal}
-                className="px-6 py-3 border-2 border-brand-600 text-brand-600 rounded-xl font-medium hover:bg-brand-50 transition-colors disabled:opacity-50"
-              >
-                {loadingPortal ? 'Loading...' : 'Manage Subscription'}
-              </button>
-            )}
-          </>
-        ) : (
-          <Link
-            href="/auth/login"
-            className="px-6 py-3 bg-brand-600 text-warm-white rounded-xl font-medium hover:bg-brand-700 transition-colors"
+        <Link
+          href={isSubscription ? '/jobs/new' : '/dashboard'}
+          className="px-6 py-3 bg-brand-600 text-warm-white rounded-xl font-medium hover:bg-brand-700 transition-colors"
+        >
+          {isSubscription ? 'Create Your First Project' : 'Go to Dashboard'}
+        </Link>
+        {isSubscription && isLoggedIn && (
+          <button
+            onClick={handleManageSubscription}
+            disabled={loadingPortal}
+            className="px-6 py-3 border-2 border-brand-600 text-brand-600 rounded-xl font-medium hover:bg-brand-50 transition-colors disabled:opacity-50"
           >
-            Sign In to Continue
-          </Link>
+            {loadingPortal ? 'Loading...' : 'Manage Subscription'}
+          </button>
         )}
       </div>
 
