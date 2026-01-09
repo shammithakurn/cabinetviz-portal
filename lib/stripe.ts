@@ -163,6 +163,10 @@ export async function createCheckoutSession({
     currency: CURRENCY.CODE.toLowerCase(),
     // Enable automatic tax calculation if configured in Stripe Dashboard
     automatic_tax: { enabled: true },
+    // Allow Stripe to update customer address from checkout (required for automatic tax)
+    customer_update: {
+      address: 'auto',
+    },
     // Allow promotion codes for discounts
     allow_promotion_codes: allowPromotionCodes,
     // Store metadata for webhook processing
