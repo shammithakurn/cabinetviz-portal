@@ -11,7 +11,8 @@ import { signIn } from 'next-auth/react'
 function RegisterForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
+  // Support both 'callbackUrl' (NextAuth standard) and 'redirect' (custom)
+  const callbackUrl = searchParams.get('callbackUrl') || searchParams.get('redirect') || '/dashboard'
 
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
@@ -60,7 +61,8 @@ function RegisterForm() {
         throw new Error(data.error || 'Registration failed')
       }
 
-      router.push('/dashboard')
+      // Redirect to callbackUrl (checkout or dashboard)
+      router.push(callbackUrl)
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
@@ -120,7 +122,11 @@ function RegisterForm() {
           </Link>
 
           <h1 className="text-2xl font-bold text-text mb-2">Create your account</h1>
-          <p className="text-text-light mb-8">Start managing your design projects today</p>
+          <p className="text-text-light mb-8">
+            {callbackUrl.includes('/checkout')
+              ? 'Create an account to complete your purchase'
+              : 'Start managing your design projects today'}
+          </p>
 
           {error && (
             <div className="bg-red-900/30 border border-red-800 text-red-400 px-4 py-3 rounded-lg mb-6">
@@ -307,7 +313,10 @@ function RegisterForm() {
 
           <p className="text-center text-text-light mt-8">
             Already have an account?{' '}
-            <Link href="/auth/login" className="text-walnut font-semibold hover:text-accent">
+            <Link
+              href={callbackUrl !== '/dashboard' ? `/auth/login?redirect=${encodeURIComponent(callbackUrl)}` : '/auth/login'}
+              className="text-walnut font-semibold hover:text-accent"
+            >
               Sign in
             </Link>
           </p>

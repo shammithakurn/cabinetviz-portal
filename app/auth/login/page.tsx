@@ -11,7 +11,8 @@ import { signIn } from 'next-auth/react'
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
+  // Support both 'callbackUrl' (NextAuth standard) and 'redirect' (custom)
+  const callbackUrl = searchParams.get('callbackUrl') || searchParams.get('redirect') || '/dashboard'
   const error = searchParams.get('error')
 
   const [isLoading, setIsLoading] = useState(false)
@@ -113,7 +114,11 @@ function LoginForm() {
           </Link>
 
           <h1 className="text-2xl font-bold text-text mb-2">Welcome back</h1>
-          <p className="text-text-light mb-8">Sign in to access your dashboard</p>
+          <p className="text-text-light mb-8">
+            {callbackUrl.includes('/checkout')
+              ? 'Please sign in to complete your purchase'
+              : 'Sign in to access your dashboard'}
+          </p>
 
           {displayError && (
             <div className="bg-red-900/30 border border-red-800 text-red-400 px-4 py-3 rounded-lg mb-6">
@@ -225,7 +230,10 @@ function LoginForm() {
 
           <p className="text-center text-text-light mt-8">
             {"Don't have an account? "}
-            <Link href="/auth/register" className="text-walnut font-semibold hover:text-accent">
+            <Link
+              href={callbackUrl !== '/dashboard' ? `/auth/register?redirect=${encodeURIComponent(callbackUrl)}` : '/auth/register'}
+              className="text-walnut font-semibold hover:text-accent"
+            >
               Create one
             </Link>
           </p>
